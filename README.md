@@ -14,8 +14,8 @@ For **phase 1** we only have 1 tile. **Phase 2** we have a whole region of Prosp
 
 
 ## useful links:
-Basic info: https://medium.com/satellite-intelligence/datathon-guide-ac6539cfd623
-Satellite image explain: https://farmonaut.com/satellite-imagery-login/
+- Basic info: https://medium.com/satellite-intelligence/datathon-guide-ac6539cfd623
+- Satellite image explain: https://farmonaut.com/satellite-imagery-login/
 
 ## Prep 
 ### step 1:
