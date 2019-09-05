@@ -10,15 +10,17 @@ The task is to build an interactive App (e.g. browser based) which utilises sate
 
 For each region (e.g. a town, a state) we have 1 metadata per date, which includes info such as coordinates, cloud coverage etc. Each region is also chopped up into some hundred tiles, which are created by the corresponding *.geojson files respectively. Each tile contains 1 mask, which reprensents sugarcane field. Each tile also contains approx. 13 satellite images including images captured by 12 different sensing bands and 1 True Color Image (TCI). The link provided below contains more info about satellite images.   
 
-For **phase 1** we only have 1 tile. **Phase 2** we have a whole region of Prosperpine with hundreds of tiles. **Phase 3** we have whole of Auatralia. 
+For [**phase 1**](https://medium.com/satellite-intelligence/phase-one-data-code-release-65ba4b5b03bb) we only have 1 tile. [**Phase 2**](https://medium.com/satellite-intelligence/phase-two-data-code-release-c72bde3ef7c2) we have a whole region of Prosperpine with hundreds of tiles. [**Phase 3**](https://medium.com/satellite-intelligence/phase-three-data-code-release-cdc89210f869) we have whole of Auatralia. 
 
 
 ## useful links:
 - Basic info: https://medium.com/satellite-intelligence/datathon-guide-ac6539cfd623
-- Satellite image explain: https://farmonaut.com/satellite-imagery-login/
+- Copernicus: https://medium.com/satellite-intelligence/introduction-to-the-european-space-agencys-copernicus-program-24497fc99364
+- Ideas to get started: https://medium.com/satellite-intelligence/phase-three-data-code-release-cdc89210f869
+- Satellite images explained: https://farmonaut.com/satellite-imagery-login/
 - How tiles are created: https://medium.com/satellite-intelligence/generating-tile-geometry-files-1776d75b1f3
 - How masks are created: https://medium.com/satellite-intelligence/creating-masks-84abbe6ecc93 
-- New mask: https://medium.com/satellite-intelligence/mask-correction-3c380c2ff588
+- Corrected mask for phase 1: https://medium.com/satellite-intelligence/mask-correction-3c380c2ff588
 
 ## Prep 
 ### step 1:
