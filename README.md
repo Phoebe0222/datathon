@@ -15,12 +15,13 @@ For [**phase 1**](https://medium.com/satellite-intelligence/phase-one-data-code-
 
 ## useful links:
 - Basic info: https://medium.com/satellite-intelligence/datathon-guide-ac6539cfd623
-- Copernicus: https://medium.com/satellite-intelligence/introduction-to-the-european-space-agencys-copernicus-program-24497fc99364
+- Copernicus: [videos](https://medium.com/satellite-intelligence/introduction-to-the-european-space-agencys-copernicus-program-24497fc99364), [wiki](https://en.wikipedia.org/wiki/Copernicus_Programme) 
 - Ideas to get started: https://medium.com/satellite-intelligence/phase-three-data-code-release-cdc89210f869
-- Satellite images explained: https://farmonaut.com/satellite-imagery-login/
+- Satellite images explained: https://farmonaut.com/satellite-imagery-login/ (highly recommanded, includes examples on how to analyse satellite data 
 - How tiles are created: https://medium.com/satellite-intelligence/generating-tile-geometry-files-1776d75b1f3
 - How masks are created: https://medium.com/satellite-intelligence/creating-masks-84abbe6ecc93 
 - Corrected mask for phase 1: https://medium.com/satellite-intelligence/mask-correction-3c380c2ff588
+- Other satellite API: https://gisgeography.com/free-satellite-imagery-data-list/
 
 ## Prep 
 ### step 1:
