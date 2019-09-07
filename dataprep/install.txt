@@ -1,1 +1,6 @@
 Pillow
+sentinelsat
+geopandas
+folium
+geojsonio
+rasterio
