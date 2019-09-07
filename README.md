@@ -17,7 +17,7 @@ For [**phase 1**](https://medium.com/satellite-intelligence/phase-one-data-code-
 - Basic info: https://medium.com/satellite-intelligence/datathon-guide-ac6539cfd623
 - Copernicus: [videos](https://medium.com/satellite-intelligence/introduction-to-the-european-space-agencys-copernicus-program-24497fc99364), [wiki](https://en.wikipedia.org/wiki/Copernicus_Programme) 
 - Ideas to get started: https://medium.com/satellite-intelligence/phase-three-data-code-release-cdc89210f869
-- Satellite images explained: https://farmonaut.com/satellite-imagery-login/ (highly recommanded, includes examples on how to analyse satellite data 
+- Satellite images explained, also examples on app: https://farmonaut.com/satellite-imagery-login/ 
 - How tiles are created: https://medium.com/satellite-intelligence/generating-tile-geometry-files-1776d75b1f3
 - How masks are created: https://medium.com/satellite-intelligence/creating-masks-84abbe6ecc93 
 - Corrected mask for phase 1: https://medium.com/satellite-intelligence/mask-correction-3c380c2ff588
@@ -32,9 +32,10 @@ https://towardsdatascience.com/satellite-imagery-access-and-analysis-in-python-j
 calculate vegetation level
 https://medium.com/analytics-vidhya/satellite-imagery-analysis-with-python-3f8ccf8a7c32
 
+### step 3:
+learn how to generate tiles and masks (phase 2 'mask-generation' folder contains .py on how to)
 
 ### future steps:
 create our own pipeline to pull data from SARA (so we have live data)
-create our own pipeline to build masks (e.g. sugarcane regions, river regions etc.) 
 
 
