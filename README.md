@@ -32,10 +32,20 @@ https://towardsdatascience.com/satellite-imagery-access-and-analysis-in-python-j
 calculate vegetation level
 https://medium.com/analytics-vidhya/satellite-imagery-analysis-with-python-3f8ccf8a7c32
 
+### step 2.5:
+other agriculture indexes 
+
 ### step 3:
 learn how to generate tiles and masks (phase 2 'mask-generation' folder contains .py on how to)
 
 ### future steps:
 create our own pipeline to pull data from SARA (so we have live data)
 
-
+## Convention in storing files:
+- data
+    - sentinel-{sentinel_number}-tile-{tile_x}x-{tile_y}y
+        - cropped (cropped png files, cropped-{tile_x}-{tile_y}-{band_number}-{yyyy}-{mm}-{dd}.png)
+        - geometry (geojson file containt polygon coords, file-x{tile_x}-y{tile_y}.geojson)
+        - masks (png files for different purpose, e.g. {sugarcane-region}-mask.png)
+        - metadata (json files in different time)
+        - timeserires (png files from different sensing bands in different time)
