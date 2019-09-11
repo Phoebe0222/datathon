@@ -5,6 +5,11 @@ datathon melbourne 2019
 
 The task is to build an interactive App (e.g. browser based) which utilises satellite data to provide insight into the production of sugarcane over time. 
 
+## Proposed ideas:
+- when should we harvest (i.e. by detecting greeness in land?) 
+- where should we water (i.e. by detecting dry/moist land?)
+
+
 
 ## Data description:
 
