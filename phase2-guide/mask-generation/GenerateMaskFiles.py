@@ -4,6 +4,8 @@
 # EMAIL: mj@growingdata.com.au, amit@growingdata.com.au
 ########################################################
 
+## The file GenerateMaskFiles.py generated the .png files that contain the tile with non-sugar areas masked (Tile generation must be completed first)
+
 import json
 from PIL import Image
 from shapely import geometry

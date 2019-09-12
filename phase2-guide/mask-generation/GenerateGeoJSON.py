@@ -4,6 +4,8 @@
 # EMAIL: mj@growingdata.com.au, amit@growingdata.com.au
 ########################################################
 
+## The file GeneratGeoJSON.py generated the .geojson files that contain the tile GPS coordinates and tile .png images
+
 import json
 from PIL import Image
 from shapely import geometry
