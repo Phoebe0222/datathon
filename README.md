@@ -1,6 +1,10 @@
 # datathon
 datathon melbourne 2019
 
+<<<<<<< HEAD
+everything: https://medium.com/satellite-intelligence
+
+=======
 ## One-sentence desription
 
 The task is to build an interactive App (e.g. browser based) which utilises satellite data to provide insight into the production of sugarcane over time. 
@@ -56,3 +60,4 @@ create our own pipeline to pull data from SARA (so we have live data)
         - masks (png files for different purpose, e.g. {sugarcane-region}-mask.png)
         - metadata (json files in different time)
         - timeserires (png files from different sensing bands in different time)
+>>>>>>> dd19c9f2154279525fe3ef037ab31a0b9a24af05
