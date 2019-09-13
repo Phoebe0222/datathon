@@ -1,0 +1,10 @@
+folium
+geojsonio
+geopandas
+geopy
+Pillow
+rasterio
+sentinelsat
+shapely
+
+
