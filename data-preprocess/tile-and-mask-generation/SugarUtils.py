@@ -21,7 +21,7 @@ def GetName(xPos,yPos):
     return "x"+str(xPos)+"-y"+str(yPos)
 
 def GetFullPath(folder,prefix,ext,xPos,yPos):
-    return folder+"/"+prefix+GetName(xPos,yPos)+ext
+    return folder+"/"+prefix+"x"+str(xPos)+"-y"+str(yPos)+ext
 
 def GetTileName(xPos,yPos):
     return GetFullPath(TILE_IMAGE_FOLDER,"tile-",".png",xPos,yPos) 
