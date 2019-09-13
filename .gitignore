@@ -1,8 +1,7 @@
 *.ipynb_checkpoints
 .DS_Store
-<<<<<<< HEAD
 *.png
 =======
 *.PNG
-
->>>>>>> 73c2d763ecca376ab9b2f10f225ee26df5e7191a
+node_modules/
+package-lock.json
