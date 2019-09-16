@@ -129,6 +129,49 @@ ul.topnav li.right {float: right;}
   cursor: pointer;
 } 
 /*Button*/
+/*Map Load*/
+.calculation-box {
+/*    background-color: #fff;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.10);
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    right: 10px;
+    z-index: 999999999999999;
+    position: absolute;
+    max-width: 400px;*/
+    height: 75px;
+    width: 150px;
+    position: absolute;
+    bottom: 40px;
+    left: 10px;
+    background-color: black;
+    padding: 15px;
+    text-align: center;
+}
+ 
+p {
+    font-family: 'Open Sans';
+    margin: 0;
+    font-size: 13px;
+}
+/*MAp load complete*/
+/*MAp gl*/
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl {
+    margin: 10px 10px 0 0;
+    float: right;
+}
+.mapboxgl-ctrl-group {
+    border-radius: 4px;
+    background: #fff;
+}
+.mapboxgl-ctrl {
+    clear: both;
+    pointer-events: auto;
+    transform: translate(0, 0);
+}
+/*Map gl*/
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
