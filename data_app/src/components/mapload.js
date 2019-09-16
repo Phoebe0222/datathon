@@ -12,9 +12,9 @@ export default class Mapload extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      lat: 27.85380233830591,
-      lng: 78.37183893820759,
-      zoom: 8.5,
+      lng: 133.8920,
+      lat: -25.0195,
+      zoom: 3.4,
     }
     
     this.drawPolygon = this.drawPolygon.bind(this);
@@ -42,6 +42,12 @@ export default class Mapload extends React.Component {
         });
         
        map.addControl(draw);
+       map.addControl(new mapboxgl.GeolocateControl({
+        positionOptions: {
+        enableHighAccuracy: true
+        },
+        trackUserLocation: true
+        }));
        
        map.on('draw.create', this.createArea);
        map.on('draw.delete', this.deleteArea);
@@ -87,6 +93,7 @@ export default class Mapload extends React.Component {
         console.log(lat_val);
         this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
             centroid.geometry.coordinates+' </strong></b></p>'+lat_val;
+        // console.log(trackUserLocation);
         // document.write(lat_val);
       }
       else{
