@@ -80,10 +80,14 @@ export default class Mapload extends React.Component {
     polygonDataCalc(data){
       if(data.features.length > 0){
         let area = area_cal(data);
+        // console.log(data);
         let centroid = centroid_cal(data);
         let rounded_area = Math.round(area*100)/100;
-        this.polygonDiv.innerHTML = '<p><strong>Area: ' + rounded_area + ' square meter</strong></p><h4>Centroid: <br />'+
-            centroid.geometry.coordinates+'</h4>';
+        let lat_val = data.features["0"].geometry.coordinates["0"];
+        console.log(lat_val);
+        this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
+            centroid.geometry.coordinates+' </strong></b></p>'+lat_val;
+        // document.write(lat_val);
       }
       else{
         console.log("Drawn Area not fetched");
