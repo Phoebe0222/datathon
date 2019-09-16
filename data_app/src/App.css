@@ -146,7 +146,7 @@ ul.topnav li.right {float: right;}
     position: absolute;
     bottom: 40px;
     left: 10px;
-    background-color: black;
+    background-color: transparent;
     padding: 15px;
     text-align: center;
 }
@@ -155,6 +155,7 @@ p {
     font-family: 'Open Sans';
     margin: 0;
     font-size: 13px;
+    width: max-content ;
 }
 /*MAp load complete*/
 /*MAp gl*/
@@ -170,6 +171,24 @@ p {
     clear: both;
     pointer-events: auto;
     transform: translate(0, 0);
+}
+h4 {
+  font-size: .75 rem;
+  font-weight:300
+}
+strong{
+  font-weight:300;
+  color: blue;
+}
+.mapboxgl-canvas-container{
+  height:500px;
+}
+a{
+  color:transparent;
+}
+canvas{
+  /*width:529px !important;*/
+  height:inherit;
 }
 /*Map gl*/
 @keyframes App-logo-spin {
