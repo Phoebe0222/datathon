@@ -5,6 +5,9 @@ import turf from '@turf/turf';
 import ReactDOM from 'react-dom';
 import area_cal from '@turf/area';
 import centroid_cal from '@turf/centroid'
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
+
+
 var map;
 var draw;
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
@@ -42,6 +45,13 @@ export default class Mapload extends React.Component {
         });
         
        map.addControl(draw);
+
+       map.addControl(new MapboxGeocoder({
+       accessToken: mapboxgl.accessToken,
+       mapboxgl: map
+       }));	
+
+
        map.addControl(new mapboxgl.GeolocateControl({
         positionOptions: {
         enableHighAccuracy: true
