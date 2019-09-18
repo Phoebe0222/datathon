@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import DatePicker from "react-datepicker";
  
 import "react-datepicker/dist/react-datepicker.css";
+import Gun from 'gun/gun';
+require('gun/sea');
+// import Gundb_demo from './gundb_demo'
 const fs = require("fs")
 const value = 1;
 
@@ -44,6 +47,14 @@ export default class Api_retrieval extends React.Component {
           document.getElementById('root').innerHTML += display_obj_2_json;
           // document.write(display_obj_2_json);
           console.log(display)
+          let id = 123;
+          const gun_display = {
+            uuid : id,
+            value : display_obj_2_json
+          } ;
+          var gun = Gun()
+          gun.get(123).put(display_obj_2_json)
+          console.log(gun)
           // document.getElementById('root').innerHTML = console.log(result.near_earth_objects[val][index]);
 
           // document.write = result.near_earth_objects[val][index];
@@ -63,6 +74,24 @@ export default class Api_retrieval extends React.Component {
           });
         }
       )
+      fetch('/hello', {
+
+    // Specify the method
+    method: 'POST',
+
+    // A JSON payload
+    body: JSON.stringify({
+        "greeting": "Hello from the browser!"
+    })
+}).then(function (response) { // At this point, Flask has printed our JSON
+    return response.text();
+}).then(function (text) {
+
+    console.log('POST response: ');
+
+    // Should be 'OK' if everything was successful
+    console.log(text);
+});
   }
 // (function(console){
 
@@ -91,10 +120,10 @@ export default class Api_retrieval extends React.Component {
 //     }
 // })(console)
   render() {
-    if(value == 1){
-      return <DatePicker selected={this.state.startDate}
-        onChange={this.handleChange}/>;
-    }
+    // if(value == 1){
+    //   return <DatePicker selected={this.state.startDate}
+    //     onChange={this.handleChange}/>;
+    // }
     
     const { error, isLoaded, items } = this.state;
     if (error) {
@@ -105,6 +134,7 @@ export default class Api_retrieval extends React.Component {
       return (
         <div>
         <p>Its fetching</p>
+        // <button onClick = {'/Gundb_demo'}>Gun Value</button>
         </div>
       );
     }
