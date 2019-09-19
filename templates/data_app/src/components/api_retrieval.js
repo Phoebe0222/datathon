@@ -8,8 +8,15 @@ require('gun/sea');
 // import Gundb_demo from './gundb_demo'
 const fs = require("fs")
 const value = 1;
-
+const display_obj_2_json = 1;
 export default class Api_retrieval extends React.Component {
+  onClickHandler = () => {
+    axios.post("http://localhost:3000", display_obj_2_json, { // receive two parameter endpoint url ,form data 
+      })
+      .then(res => { // then print response status
+        console.log(res.statusText)
+      })
+}
   constructor(props) {
     super(props);
     this.state = {
@@ -43,7 +50,7 @@ export default class Api_retrieval extends React.Component {
           // document.write(result.near_earth_objects[val][index])
           let display = result.near_earth_objects[val][index];
            // document.getElementById('root').innerHTML += (JSON && JSON.stringify ? JSON.stringify(display) : display) + '<br />';
-          let display_obj_2_json = (JSON && JSON.stringify ? JSON.stringify(display) : display) ;
+          display_obj_2_json = (JSON && JSON.stringify ? JSON.stringify(display) : display) ;
           document.getElementById('root').innerHTML += display_obj_2_json;
           // document.write(display_obj_2_json);
           console.log(display)
@@ -74,24 +81,7 @@ export default class Api_retrieval extends React.Component {
           });
         }
       )
-      fetch('/hello', {
-
-    // Specify the method
-    method: 'POST',
-
-    // A JSON payload
-    body: JSON.stringify({
-        "greeting": "Hello from the browser!"
-    })
-}).then(function (response) { // At this point, Flask has printed our JSON
-    return response.text();
-}).then(function (text) {
-
-    console.log('POST response: ');
-
-    // Should be 'OK' if everything was successful
-    console.log(text);
-});
+ 
   }
 // (function(console){
 
@@ -134,7 +124,7 @@ export default class Api_retrieval extends React.Component {
       return (
         <div>
         <p>Its fetching</p>
-        // <button onClick = {'/Gundb_demo'}>Gun Value</button>
+         <button onClick = {this.onClickHandler}>Upload</button>
         </div>
       );
     }
