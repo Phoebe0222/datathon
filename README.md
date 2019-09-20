@@ -52,12 +52,29 @@ learn how to generate tiles and masks (phase 2 'mask-generation' folder contains
 ### future steps:
 create our own pipeline to pull data from SARA (so we have live data)
 
-## Convention in storing files:
+## Convention in storing data:
 - data
-    - sentinel-{sentinel_number}-tile-{tile_x}x-{tile_y}y
-        - cropped (cropped png files, cropped-{tile_x}-{tile_y}-{band_number}-{yyyy}-{mm}-{dd}.png)
-        - geometry (geojson file containt polygon coords, file-x{tile_x}-y{tile_y}.geojson)
-        - masks (png files for different purpose, e.g. {sugarcane-region}-mask.png)
-        - metadata (json files in different time)
-        - timeserires (png files from different sensing bands in different time)
->>>>>>> dd19c9f2154279525fe3ef037ab31a0b9a24af05
+    - cropped
+        - cropped png files for tiles: cropped-{tile_x}-{tile_y}-{band}-{yyyy}-{mm}-{dd}.png
+    - geometries 
+        - geojson files containt polygon coords to create tiles: geo-x{tile_x}-y{tile_y}.geojson
+    - metadata 
+        - metadata for the whole region: {yyyy}-{mm}-{dd}.json
+    - sugarcanemasks
+        - masks for sugarcane fields for each tile: mask-x{tile_x}-y{tile_y}.png  
+    - tiles
+        - bands for each tile per band per day: {tile_x}-{tile_y}-{band}-{yyyy}-{mm}-{dd}.png 
+
+- output
+    - ndvi 
+        - ndvi maps for each tile per day: ndvimap-{tile_x}-{tile_y}-{yyyy}-{mm}-{dd}.png
+        
+    - tci
+        - tci for each tile per day: tci-{tile_x}-{tile_y}-{yyyy}-{mm}-{dd}.png
+    - fci-mode1
+        - vegetation fci for each tile per day: fci-mode1-{tile_x}-{tile_y}-{yyyy}-{mm}-{dd}.png
+    - fci-mode2
+        - newly burnt land fci for each tile per day: fci-mode2-{tile_x}-{tile_y}-{yyyy}-{mm}-{dd}.png
+    - fci-mode3
+        - clouds fci for each tile per day: fci-mode3-{tile_x}-{tile_y}-{yyyy}-{mm}-{dd}.png
+      
