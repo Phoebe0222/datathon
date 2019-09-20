@@ -62,6 +62,21 @@ export default class Mapload extends React.Component {
        map.on('draw.create', this.createArea);
        map.on('draw.delete', this.deleteArea);
        map.on('draw.update', this.updateArea);
+
+
+       map.on('load', function(){
+        map.addLayer({
+          "id": "simple-tiles",
+          "type": "raster",
+          "source": {
+            "type": "raster",
+            "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
+            "tileSize": 256
+          },
+          "minzoom": 0,
+          "maxzoom": 22
+        });
+      });
    }
    
    drawPolygon(points) {
