@@ -16,7 +16,7 @@ The task is to build an interactive App (e.g. browser based) which utilises sate
 
 
 
-## Data description:
+## Data description: [DOWNLOAD LINK](https://1drv.ms/u/s!Al9oqaKvmvr0g8p2KgCbZQ-JJQGCoQ?e=eZrRyv)
 
 For each region (e.g. a town, a state) we have 1 metadata per date, which includes info such as coordinates, cloud coverage etc. Each region is also chopped up into some hundred tiles, which are created by the corresponding *.geojson files respectively. Each tile contains 1 mask, which reprensents sugarcane field. Each tile also contains approx. 13 satellite images including images captured by 12 different sensing bands and 1 True Color Image (TCI). The link provided below contains more info about satellite images.   
 
