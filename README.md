@@ -55,8 +55,6 @@ create our own pipeline to pull data from SARA (so we have live data)
 
 ## Convention in storing data:
 - data
-    - cropped
-        - cropped png files for tiles: cropped-{tile_x}-{tile_y}-{band}-{yyyy}-{mm}-{dd}.png
     - geometries 
         - geojson files containt polygon coords to create tiles: geo-x{tile_x}-y{tile_y}.geojson
     - metadata 
@@ -78,4 +76,6 @@ create our own pipeline to pull data from SARA (so we have live data)
         - newly burnt land fci for each tile per day: fci-mode2-{tile_x}-{tile_y}-{yyyy}-{mm}-{dd}.png
     - fci-mode3
         - clouds fci for each tile per day: fci-mode3-{tile_x}-{tile_y}-{yyyy}-{mm}-{dd}.png
+    - cropped
+        - cropped png files for tiles: cropped-{tile_x}-{tile_y}-{img}-{yyyy}-{mm}-{dd}.png
       
