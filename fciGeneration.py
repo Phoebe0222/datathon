@@ -27,16 +27,14 @@ def get_mask_path(tile_x, tile_y, mask_type): #mask_type is sugarcane coz it's i
 
 # Get a list of all the image tiles for a specific x,y coordinate
 # for the specified band
-def get_tiles_band_paths(tile_x, tile_y, band, date):
+def get_tiles_band_path(tile_x, tile_y, band, date):
     path = f"./data/tiles/{tile_x}-{tile_y}-{band}-{date}.png"
     #path = glob.glob(path) # a list of paths
     #path = path[0] # get the first date 
     return path 
 
-def get_cropped_band_paths(tile_x, tile_y, band, date):
-    path = f"./data/cropped/cropped-{tile_x}-{tile_y}-{band}-{date}.png"
-    #path = glob.glob(path)
-    #path = path[0] # get the first date 
+def get_img_path(tile_x, tile_y, img, date):
+    path = f"./Output/{img}/{img}-{tile_x}-{tile_y}-{date}.png"
     return path 
 
 
@@ -54,17 +52,15 @@ def is_in_mask(mask_pixels, pixel_x, pixel_y):
         return False
 
     
-def get_cropped_pixels(tile_x, tile_y, mask_type, band, date):
+def get_cropped_pixels(tile_x, tile_y, mask_type, img, date):
     
     # get the pixels from mask and image 
     mask_pixels = get_image_pixels(get_mask_path(tile_x, tile_y, mask_type))
-    image_pixels = get_image_pixels(get_tiles_band_paths(tile_x, tile_y, band, date))
+    image_pixels = get_image_pixels(get_img_path(tile_x, tile_y, img, date))
     
     
     width = TILE_WIDTH_PX 
     height = TILE_HEIGHT_PX 
-    bands = Image.open(get_tiles_band_paths(tile_x, tile_y, band, date)).getbands()
-    num_channels = np.shape(bands)[0]
 
     for x in range(0, width):
         for y in range(0, height):
@@ -74,20 +70,17 @@ def get_cropped_pixels(tile_x, tile_y, mask_type, band, date):
             if in_mask:
                 pass
             else:
-                if num_channels == 3:
-                    image_pixels[x,y] = (0,0,0,0) #if not in mask, change to transparent
-                else:
-                    image_pixels[x,y] = 0 # not sure about this, what does 0 in "I" mean?
-    
+                image_pixels[x,y] = (0,0,0) #if not in mask, change to transparent
+                
     cropped_pixels = image_pixels
     #print("The png file is in " + str(bands) + " mode.")
     return cropped_pixels
     
 
-def sequence_cropped_pixels(tile_x, tile_y, mask_type, band, date):
+def sequence_cropped_pixels(tile_x, tile_y, mask_type, img, date):
     
     # get the pixels from cropped
-    cropped_pixels = get_cropped_pixels(tile_x, tile_y, mask_type, band, date)
+    cropped_pixels = get_cropped_pixels(tile_x, tile_y, mask_type, img, date)
 
     cropped_sequence = []
     
@@ -101,18 +94,11 @@ def sequence_cropped_pixels(tile_x, tile_y, mask_type, band, date):
 
 
 
-def save_cropped(tile_x, tile_y, mask_type, band, date):
-    cropped = Image.new("I", (512, 512))
-    cropped.putdata(sequence_cropped_pixels(tile_x, tile_y, mask_type, band, date))
-    #cropped.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
-    cropped.save(f'./data/cropped/cropped-{tile_x}-{tile_y}-{band}-{date}.png')
-    return cropped
-
-def save_cropped_TCI(tile_x, tile_y, mask_type, date, band='TCI'):
+def save_cropped(tile_x, tile_y, mask_type, img, date):
     cropped = Image.new("RGBA", (512, 512))
-    cropped.putdata(sequence_cropped_pixels(tile_x, tile_y, mask_type, band, date))
+    cropped.putdata(sequence_cropped_pixels(tile_x, tile_y, mask_type, img, date))
     #cropped.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
-    cropped.save(f'./data/cropped/cropped-{tile_x}-{tile_y}-{band}-{date}.png')
+    cropped.save(f'./Output/cropped/cropped-{tile_x}-{tile_y}-{img}-{date}.png')
     return cropped
 
 
@@ -121,11 +107,8 @@ def normalize(array):
     return ((array - array_min)/(array_max - array_min))
 
 # get band pixels, setting ceopped = Ture to use cropped bands 
-def get_band(tile_x, tile_y, date, band, cropped = False):
-    if cropped == True:
-        path = get_cropped_band_paths(tile_x, tile_y, band, date)
-    else:
-        path = get_tiles_band_paths(tile_x, tile_y, band, date)
+def get_band(tile_x, tile_y, date, band):
+    path = get_tiles_band_path(tile_x, tile_y, band, date)
     
     b = rio.open(path)
     read = normalize(b.read(1))
@@ -152,7 +135,10 @@ def TCI(tile_x, tile_y, date):
 
     # View the color composite
     plt.imshow(tci)
-    plt.savefig(f'./Output/tci/tci-{tile_x}-{tile_y}-{date}.png')    
+    plt.savefig(f'./Output/tci/tci-{tile_x}-{tile_y}-{date}.png')  
+    
+    print(Image.open(f'./Output/tci/tci-{tile_x}-{tile_y}-{date}.png').size)
+    
     
     return tci
 
@@ -234,8 +220,8 @@ TILE_Y = 1024 # ranges from 1024 to 10240
 IS_IN_MASK_PIXEL_VALUE = (0, 0, 0, 255)
 
 # Tile width / height in pixels
-TILE_WIDTH_PX = 512 - 1 
-TILE_HEIGHT_PX = 512 - 1 
+TILE_WIDTH_PX = 512 - 2 
+TILE_HEIGHT_PX = 512 - 2 
 
 
 
@@ -243,16 +229,16 @@ start_arg_crop = {
     "tile_x":TILE_X,
     "tile_y":TILE_Y,
     "mask_type":'sugarcane',
-    "band":'B01',
+    "img":'tci',
     "date":'2016-12-22'}
-save_cropped(**start_arg_crop)
+#save_cropped(**start_arg_crop)
 
 
 start_arg_img = {
     "tile_x":TILE_X,
     "tile_y":TILE_Y,
     "date":'2016-12-22'}
-NDVI(**start_arg_img)
+#NDVI(**start_arg_img)
 TCI(**start_arg_img)
-FCI(**start_arg_img)ndvi
+#FCI(**start_arg_img)
 
