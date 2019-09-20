@@ -23,6 +23,15 @@ var cors = require('cors');
 var name = 'yo'; 
 // Creates a server which runs on port 3000 and  
 // can be accessed through localhost:3000 
+// Access-Control-Allow-Origin: *
+
+// var corsOptions = {
+//   // origin: 'http://example.com',
+//   // optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   Access-Control-Allow-Origin: *
+// }
+
+
 app.listen(3000, function() { 
     console.log('server running on port 3000'); 
 } ) 
@@ -44,6 +53,7 @@ function callName(req, res) {
     // Use child_process.spawn method from  
     // child_process module and assign it 
     // to variable spawn 
+    res.header("Access-Control-Allow-Origin", "*");
     var spawn = require("child_process").spawn; 
       
     // Parameters passed in spawn - 
