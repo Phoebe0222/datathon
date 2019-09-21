@@ -11,6 +11,7 @@ import JSONPretty from 'react-json-pretty';
 var map;
 var draw;
 let geo_json;
+var count_create = "0";
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 export default class Mapload extends React.Component {
   constructor(props) {
@@ -39,11 +40,11 @@ export default class Mapload extends React.Component {
         });
         
         draw = new MapboxDraw({
-            displayControlsDefault: false,
-            controls: {
-                polygon: true,
-                trash: true
-            }
+            displayControlsDefault: true,
+            // controls: {
+            //     polygon: true,
+            //     trash: true
+            // }
         });
         
        map.addControl(draw);
@@ -105,11 +106,26 @@ export default class Mapload extends React.Component {
     
      createArea(e) {
           let data = draw.getAll();
-
-          const polygonData = data.features[0].geometry.coordinates;
-          console.log("polygonData"+polygonData);
+          console.log(data);
+           // if(count_create>0){
+           //   map.removeLayer('maine').removeSource('maine');
+           // }
+           // console.log(toString(count_create));
+            const polygonData = data.features[count_create].geometry.coordinates;
+          console.log("polygonData"+data);
           this.drawPolygon(polygonData);
+          // } 
+          // else{
+          //             const polygonData = data.features[0].geometry.coordinates;
+          // console.log("polygonData"+polygonData);
+          // this.drawPolygon(polygonData);
+          // }  
+
+          
           this.polygonDataCalc(data);
+          count_create = (parseInt(count_create)+1).toString(10);
+          console.log(count_create);
+
          
     }
     syntaxHighlight(json){
@@ -136,11 +152,12 @@ export default class Mapload extends React.Component {
         // console.log(data);
         let centroid = centroid_cal(data);
         let rounded_area = Math.round(area*100)/100;
-        let coordinates_value = data.features["0"].geometry.coordinates["0"];
+        console.log(data.features["0"].geometry);
+        let coordinates_value = data.features[count_create].geometry.coordinates["0"];
         // console.log(data.features["0"].geometry.coordinates["0"]["0"]);
         // console.log(coordinates_value);
         // let coordinates_value_json = JSON.stringify(coordinates_value, undefined, 4);
-        console.log(coordinates_value[0])
+        console.log(coordinates_value)
         geo_json = {
           Feature: "Polygon",
           Coordinates: coordinates_value,
@@ -158,7 +175,7 @@ export default class Mapload extends React.Component {
         // this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
         //     centroid.geometry.coordinates+' </strong></b></p>'+lat_val;
         let geo_json_readable = this.syntaxHighlight(geo_json_stringified);
-        this.polygonDiv.innerHTML = '<pre>'+geo_json_readable+'</pre>';
+        this.polygonDiv.innerHTML =+ '<pre>'+geo_json_readable+'</pre>';
         // this.polygonDiv.innerHTML = coordinates_value_json[2];
         // this.polygonDiv.innerHTML = '<JSONPretty id = "json-pretty"'
         // this.polygonDiv.innerHTML = '<JSONPretty data = { geo_json }></JSONPretty>'
