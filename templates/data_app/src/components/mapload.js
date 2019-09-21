@@ -71,7 +71,19 @@ export default class Mapload extends React.Component {
        map.on('draw.delete', this.deleteArea);
        map.on('draw.update', this.updateArea);
 
-
+       map.on('load', function(){
+            map.addLayer({
+              "id": "simple-tiles",
+              "type": "raster",
+              "source": {
+                "type": "raster",
+                "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
+                "tileSize": 256
+              },
+              "minzoom": 0,
+              "maxzoom": 22
+            });
+          });
        
    }
   switchLayer(layer) {
@@ -178,7 +190,7 @@ map.setStyle('mapbox://styles/mapbox/' + layerId);
         // let coordinates_value_json = JSON.stringify(coordinates_value, undefined, 4);
         console.log(coordinates_value)
         geo_json = {
-          Feature: "Polygon",
+          Feature: data.features[count_create].geometry.type,
           Coordinates: coordinates_value,
           Centroid: centroid.geometry.coordinates,
           Area: rounded_area+"sq.m"

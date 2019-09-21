@@ -205,6 +205,8 @@ canvas{
   height:inherit;
 }
 /*Map gl*/
+/*Cursor changes*/
+.mapboxgl-canvas{ cursor: crosshair; }
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
