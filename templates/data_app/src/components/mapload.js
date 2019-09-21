@@ -175,7 +175,12 @@ export default class Mapload extends React.Component {
         // this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
         //     centroid.geometry.coordinates+' </strong></b></p>'+lat_val;
         let geo_json_readable = this.syntaxHighlight(geo_json_stringified);
-        this.polygonDiv.innerHTML =+ '<pre>'+geo_json_readable+'</pre>';
+        console.log(typeof(geo_json_readable));
+        // this.polygonDiv.innerHTML =+ '<pre>'+geo_json_readable+'</pre>';
+        var pre_tag = document.createElement("PRE");
+        var t = document.createTextNode(geo_json_stringified);
+        pre_tag.appendChild(t);
+        document.getElementById("calculated-area").appendChild(pre_tag);  
         // this.polygonDiv.innerHTML = coordinates_value_json[2];
         // this.polygonDiv.innerHTML = '<JSONPretty id = "json-pretty"'
         // this.polygonDiv.innerHTML = '<JSONPretty data = { geo_json }></JSONPretty>'
