@@ -4,12 +4,13 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import turf from '@turf/turf';
 import ReactDOM from 'react-dom';
 import area_cal from '@turf/area';
-import centroid_cal from '@turf/centroid'
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
-
+import centroid_cal from '@turf/centroid';
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import JSONPretty from 'react-json-pretty';
 
 var map;
 var draw;
+let geo_json;
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 export default class Mapload extends React.Component {
   constructor(props) {
@@ -25,6 +26,7 @@ export default class Mapload extends React.Component {
     this.updateArea = this.updateArea.bind(this);
     // this.showPolygonData = this.showPolygonData.bind(this);
     this.polygonDataCalc = this.polygonDataCalc.bind(this);
+    this.syntaxHighlight = this.syntaxHighlight.bind(this);
 }
   
     componentDidMount() {
@@ -49,7 +51,7 @@ export default class Mapload extends React.Component {
        map.addControl(new MapboxGeocoder({
        accessToken: mapboxgl.accessToken,
        mapboxgl: map
-       }));	
+       })); 
 
 
        map.addControl(new mapboxgl.GeolocateControl({
@@ -62,6 +64,21 @@ export default class Mapload extends React.Component {
        map.on('draw.create', this.createArea);
        map.on('draw.delete', this.deleteArea);
        map.on('draw.update', this.updateArea);
+
+
+       map.on('load', function(){
+        map.addLayer({
+          "id": "simple-tiles",
+          "type": "raster",
+          "source": {
+            "type": "raster",
+            "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
+            "tileSize": 256
+          },
+          "minzoom": 0,
+          "maxzoom": 22
+        });
+      });
    }
    
    drawPolygon(points) {
@@ -88,21 +105,63 @@ export default class Mapload extends React.Component {
     
      createArea(e) {
           let data = draw.getAll();
+
           const polygonData = data.features[0].geometry.coordinates;
+          console.log("polygonData"+polygonData);
           this.drawPolygon(polygonData);
           this.polygonDataCalc(data);
+         
     }
-    
+    syntaxHighlight(json){
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
     polygonDataCalc(data){
       if(data.features.length > 0){
         let area = area_cal(data);
         // console.log(data);
         let centroid = centroid_cal(data);
         let rounded_area = Math.round(area*100)/100;
-        let lat_val = data.features["0"].geometry.coordinates["0"];
-        console.log(lat_val);
-        this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
-            centroid.geometry.coordinates+' </strong></b></p>'+lat_val;
+        let coordinates_value = data.features["0"].geometry.coordinates["0"];
+        // console.log(data.features["0"].geometry.coordinates["0"]["0"]);
+        // console.log(coordinates_value);
+        // let coordinates_value_json = JSON.stringify(coordinates_value, undefined, 4);
+        console.log(coordinates_value[0])
+        geo_json = {
+          Feature: "Polygon",
+          Coordinates: coordinates_value,
+          Centroid: centroid.geometry.coordinates,
+          Area: rounded_area+"sq.m"
+          // coordinates:{coordinates1:coordinates_value[0],coordinates2:coordinates_value[1],coordinates3:coordinates_value[2]}
+          // coordinates:coordinates_value[0],
+          // coordinates2:coordinates_value[1],
+          // coordinates3:coordinates_value[2]
+        }
+        console.log(JSON.stringify(geo_json))
+
+
+        let geo_json_stringified = JSON.stringify(geo_json, undefined, 2)
+        // this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
+        //     centroid.geometry.coordinates+' </strong></b></p>'+lat_val;
+        let geo_json_readable = this.syntaxHighlight(geo_json_stringified);
+        this.polygonDiv.innerHTML = '<pre>'+geo_json_readable+'</pre>';
+        // this.polygonDiv.innerHTML = coordinates_value_json[2];
+        // this.polygonDiv.innerHTML = '<JSONPretty id = "json-pretty"'
+        // this.polygonDiv.innerHTML = '<JSONPretty data = { geo_json }></JSONPretty>'
         // console.log(trackUserLocation);
         // document.write(lat_val);
       }
@@ -128,7 +187,8 @@ updateArea(e) {
       <div>
         <div ref={e => this.mapDiv = e} className="map"></div>
         <div className='calculation-box'>
-          <div id='calculated-area' ref={el => this.polygonDiv = el}></div>
+          <div id='calculated-area' ref={el => this.polygonDiv = el}>
+          </div>
         </div>
       </div>
     )

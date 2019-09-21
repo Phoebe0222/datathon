@@ -158,6 +158,20 @@ p {
     width: max-content ;
 }
 /*MAp load complete*/
+/*Calculated Area*/
+#calculated-area{
+  color: blue;
+  font-family: vermont;
+  font-size: 25px;
+}
+pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; width:max-content;}
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; }
+
+/*End of Calculated Area*/
 /*MAp gl*/
 .mapboxgl-ctrl-top-right .mapboxgl-ctrl {
     margin: 10px 10px 0 0;
