@@ -12,6 +12,9 @@ var map;
 var draw;
 let geo_json;
 var count_create = "0";
+
+ 
+
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 export default class Mapload extends React.Component {
   constructor(props) {
@@ -28,6 +31,8 @@ export default class Mapload extends React.Component {
     // this.showPolygonData = this.showPolygonData.bind(this);
     this.polygonDataCalc = this.polygonDataCalc.bind(this);
     this.syntaxHighlight = this.syntaxHighlight.bind(this);
+    this.changeMap = this.changeMap.bind(this);
+    this.switchLayer = this.switchLayer.bind(this);
 }
   
     componentDidMount() {
@@ -67,20 +72,34 @@ export default class Mapload extends React.Component {
        map.on('draw.update', this.updateArea);
 
 
-       map.on('load', function(){
-        map.addLayer({
-          "id": "simple-tiles",
-          "type": "raster",
-          "source": {
-            "type": "raster",
-            "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
-            "tileSize": 256
-          },
-          "minzoom": 0,
-          "maxzoom": 22
-        });
-      });
+       
    }
+  switchLayer(layer) {
+    var layerList = document.getElementById('menu');
+var inputs = layerList.getElementsByTagName('input');
+var layerId = layer.target.id;
+map.setStyle('mapbox://styles/mapbox/' + layerId);
+}
+ 
+// for (var i = 0; i < inputs.length; i++) {
+// inputs[i].onclick = switchLayer;
+// }
+  changeMap(e){
+            console.log("Entered")
+            map.on(e, function(){
+            map.addLayer({
+              "id": "simple-tiles",
+              "type": "raster",
+              "source": {
+                "type": "raster",
+                "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
+                "tileSize": 256
+              },
+              "minzoom": 0,
+              "maxzoom": 22
+            });
+          });
+       }
    
    drawPolygon(points) {
         map.addLayer({
@@ -208,6 +227,14 @@ updateArea(e) {
     return (
       <div>
         <div ref={e => this.mapDiv = e} className="map"></div>
+        // <div><button onClick = { this.changeMap }></button></div>
+        <div id='menu'>
+<input id='streets-v11' type='radio' name='rtoggle' value='streets' onClick={this.switchLayer}></input>
+<label for='streets'>streets</label>
+<input id='satellite-v9' type='radio' name='rtoggle' value='satellite' onClick={this.switchLayer}></input>
+<label for='satellite'>satellite</label>
+</div>
+
         <div className='calculation-box'>
           <div id='calculated-area' ref={el => this.polygonDiv = el}>
           </div>
