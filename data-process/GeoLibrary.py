@@ -3,6 +3,10 @@
 # AUTHOR: Michael-James Coetzee, Amit Wats
 # EMAIL: mj@growingdata.com.au, amit@growingdata.com.au
 ########################################################
+
+## Library for dependent scripts (tile-and-mask-generation.py)
+
+
 #import subprocess 
 #subprocess.run("pip install -r requirements.txt")
 
