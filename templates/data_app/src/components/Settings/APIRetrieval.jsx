@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import DatePicker from "react-datepicker";
- 
+
 import "react-datepicker/dist/react-datepicker.css";
 import Gun from 'gun/gun';
 require('gun/sea');
@@ -12,9 +12,9 @@ const value = 1;
 let display_obj_2_json = 1;
 
 //Weather, Nasa ,Copper,SOIl,Pest
-export default class Api_retrieval extends React.Component {
+export default class APIRetrieval extends React.Component {
 
-  
+
   constructor(props) {
     super(props);
     this.onClickHandler = this.onClickHandler.bind(this);
@@ -25,18 +25,15 @@ export default class Api_retrieval extends React.Component {
       startDate: new Date()
     };
   }
-//   onClickHandler(event) {
-//     console.log("Entered")
-//     // x
-// }
- onClickHandler = () => {
+
+  onClickHandler = () => {
     axios.post("http://localhost:3000", display_obj_2_json, { // receive two parameter endpoint url ,form data 
-      })
+    })
       .then(res => { // then print response status
         console.log(res.statusText)
         console.log("Entered")
       })
-}
+  }
   handleChange = date => {
     this.setState({
       startDate: date
@@ -45,7 +42,7 @@ export default class Api_retrieval extends React.Component {
   componentDidMount() {
     let fetch_val = fetch("https://api.nasa.gov/neo/rest/v1/feed?start_date=2019-09-06&end_date=2019-09-07&&id=2465617&results=1&api_key=KwRDL3x7w75naVBiJua5GmSpMEDn75yNMjMqacS8");
     fetch_val = (fetch_val => fetch_val.json())
-    console.log(fetch_val);  
+    console.log(fetch_val);
     fetch("https://api.nasa.gov/neo/rest/v1/feed?start_date=2019-09-06&end_date=2019-09-07&&id=2465617&results=1&api_key=KwRDL3x7w75naVBiJua5GmSpMEDn75yNMjMqacS8")
       .then(res => res.json())
       .then(
@@ -60,8 +57,8 @@ export default class Api_retrieval extends React.Component {
           const index = "0";
           // document.write(result.near_earth_objects[val][index])
           let display = result.near_earth_objects[val][index];
-           // document.getElementById('root').innerHTML += (JSON && JSON.stringify ? JSON.stringify(display) : display) + '<br />';
-          display_obj_2_json = (JSON && JSON.stringify ? JSON.stringify(display) : display) ;
+          // document.getElementById('root').innerHTML += (JSON && JSON.stringify ? JSON.stringify(display) : display) + '<br />';
+          display_obj_2_json = (JSON && JSON.stringify ? JSON.stringify(display) : display);
           // document.getElementById('root').innerHTML += display_obj_2_json;
           // document.write(display_obj_2_json);
           console.log(display)
@@ -92,43 +89,43 @@ export default class Api_retrieval extends React.Component {
           });
         }
       )
- 
+
   }
-// (function(console){
+  // (function(console){
 
-//     console.save = function(data, filename){
+  //     console.save = function(data, filename){
 
-//         if(!data) {
-//             console.error('Console.save: No data')
-//             return;
-//         }
+  //         if(!data) {
+  //             console.error('Console.save: No data')
+  //             return;
+  //         }
 
-//         if(!filename) filename = 'console.json'
+  //         if(!filename) filename = 'console.json'
 
-//         if(typeof data === "object"){
-//             data = JSON.stringify(data, undefined, 4)
-//         }
+  //         if(typeof data === "object"){
+  //             data = JSON.stringify(data, undefined, 4)
+  //         }
 
-//         var blob = new Blob([data], {type: 'text/json'}),
-//             e    = document.createEvent('MouseEvents'),
-//             a    = document.createElement('a')
+  //         var blob = new Blob([data], {type: 'text/json'}),
+  //             e    = document.createEvent('MouseEvents'),
+  //             a    = document.createElement('a')
 
-//         a.download = filename
-//         a.href = window.URL.createObjectURL(blob)
-//         a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
-//         e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-//         a.dispatchEvent(e)
-//     }
-// })(console)
+  //         a.download = filename
+  //         a.href = window.URL.createObjectURL(blob)
+  //         a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
+  //         e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+  //         a.dispatchEvent(e)
+  //     }
+  // })(console)
   render() {
-    return(
-      <button onClick = {this.onClickHandler}>Upload</button>
-      );
+    return (
+      <button onClick={this.onClickHandler}>Upload</button>
+    );
     // if(value == 1){
     //   return <DatePicker selected={this.state.startDate}
     //     onChange={this.handleChange}/>;
     // }
-    
+
     // const { error, isLoaded, items } = this.state;
     // if (error) {
     //   return <div>Error: {error.message}</div>;
