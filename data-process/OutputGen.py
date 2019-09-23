@@ -28,7 +28,7 @@ def tile_name_gen():
 
 tile_x, tile_y, date, count = tile_name_gen()
 
-
+#####################  Generate NDVI, FCI, FCI  #####################
 print("Generating Images .....")
 
 for i in range(count):
