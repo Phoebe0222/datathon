@@ -1,5 +1,5 @@
-# datathon
-datathon melbourne 2019
+# Datathon
+Datathon Melbourne 2019
 
-everything: https://medium.com/satellite-intelligence
+https://medium.com/satellite-intelligence
 
