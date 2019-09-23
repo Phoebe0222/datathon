@@ -6,6 +6,7 @@ import { Router, Route, Switch, Redirect } from "react-router-dom";
 import UserLayout from "./layouts/User";
 import * as serviceWorker from './serviceWorker';
 import "./assets/css/datathon.css";
+import "./assets/css/mapbox.css";
 
 const hist = createBrowserHistory();
 

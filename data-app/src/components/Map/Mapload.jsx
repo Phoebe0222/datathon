@@ -1,6 +1,10 @@
 import React from 'react';
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import RulerControl from 'mapbox-gl-controls/lib/ruler';
+import StylesControl from 'mapbox-gl-controls/lib/styles';
+import CompassControl from 'mapbox-gl-controls/lib/compass';
+import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import area_cal from '@turf/area';
 import centroid_cal from '@turf/centroid';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -26,9 +30,9 @@ export default class Mapload extends React.Component {
     this.updateArea = this.updateArea.bind(this);
     // this.showPolygonData = this.showPolygonData.bind(this);
     this.polygonDataCalc = this.polygonDataCalc.bind(this);
-    this.syntaxHighlight = this.syntaxHighlight.bind(this);
-    this.changeMap = this.changeMap.bind(this);
-    this.switchLayer = this.switchLayer.bind(this);
+    // this.syntaxHighlight = this.syntaxHighlight.bind(this);
+    // this.changeMap = this.changeMap.bind(this);
+    // this.switchLayer = this.switchLayer.bind(this);
   }
 
   componentDidMount() {
@@ -44,17 +48,18 @@ export default class Mapload extends React.Component {
 
     map = new mapboxgl.Map({
       container: this.mapDiv,
-      style: 'mapbox://styles/mapbox/streets-v11',
+      style: 'mapbox://styles/mapbox/streets-v10?optimize=true',
       center: [lng, lat],
       zoom: zoom
     });
 
     draw = new MapboxDraw({
-      displayControlsDefault: true,
-      // controls: {
-      //   polygon: true,
-      //   trash: true
-      // }
+      displayControlsDefault: false,
+      controls: {
+        polygon: true,
+        point: true,
+        trash: true
+      }
     });
 
     map.addControl(new MapboxGeocoder({
@@ -63,7 +68,22 @@ export default class Mapload extends React.Component {
     }));
 
 
-    map.addControl(draw);
+    // with custom styles:
+    map.addControl(new StylesControl({
+      styles: [
+        {
+          label: 'Streets',
+          styleName: 'Mapbox Streets',
+          styleUrl: 'mapbox://styles/mapbox/streets-v9',
+        }, {
+          label: 'Satellite',
+          styleName: 'Satellite',
+          styleUrl: 'mapbox://styles/mapbox/satellite-v9',
+        },
+      ],
+      onChange: (style) => console.log(style),
+    }), 'top-left');
+    map.addControl(draw, 'top-left');
 
 
     map.addControl(new mapboxgl.GeolocateControl({
@@ -73,22 +93,25 @@ export default class Mapload extends React.Component {
       trackUserLocation: true
     }));
 
+    map.addControl(new ZoomControl(), 'top-right');
+    map.addControl(new CompassControl(), 'top-right');
+
     map.on('draw.create', this.createArea);
     map.on('draw.delete', this.deleteArea);
     map.on('draw.update', this.updateArea);
-    map.on('load', function () {
-      map.addLayer({
-        "id": "simple-tiles",
-        "type": "raster",
-        "source": {
-          "type": "raster",
-          "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
-          "tileSize": 256
-        },
-        "minzoom": 0,
-        "maxzoom": 22
-      });
-    });
+    // map.on('load', function () {
+    //   map.addLayer({
+    //     "id": "simple-tiles",
+    //     "type": "raster",
+    //     "source": {
+    //       "type": "raster",
+    //       "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
+    //       "tileSize": 256
+    //     },
+    //     "minzoom": 0,
+    //     "maxzoom": 22
+    //   });
+    // });
 
   }
   switchLayer(layer) {
@@ -243,23 +266,7 @@ export default class Mapload extends React.Component {
 
         <div ref={e => this.mapDiv = e} className="map"></div>
         {/* <div><button onClick = { this.changeMap }></button></div> */}
-        <div id='menu'>
-          <FormGroup tag="fieldset">
-            {/* <legend>Select Map View</legend> */}
-            <FormGroup check>
-              <Label check>
-                <Input id='streets-v11' type="radio" value='streets' name="rtoggle" onClick={this.switchLayer} />{' '}
-                Street View
-            </Label>
-            </FormGroup>
-            <FormGroup check>
-              <Label check>
-                <Input id='satellite-v9' type="radio" value='satellite' name="rtoggle" onClick={this.switchLayer} />{' '}
-                Satellite View
-            </Label>
-            </FormGroup>
-          </FormGroup>
-        </div>
+
         <div className='calculation-box'>
           <div id='calculated-area' ref={el => this.polygonDiv = el}>
           </div>
