@@ -240,6 +240,7 @@ export default class Mapload extends React.Component {
   render() {
     return (
       <div>
+
         <div ref={e => this.mapDiv = e} className="map"></div>
         {/* <div><button onClick = { this.changeMap }></button></div> */}
         <div id='menu'>
