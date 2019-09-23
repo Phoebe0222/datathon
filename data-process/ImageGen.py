@@ -7,6 +7,8 @@
 ##################################################################################
 
 
+## Library for dependent scripts (OutputGen.py, UNET.py)
+
 # pip install -r requirements.txt
 
 import subprocess 
@@ -210,8 +212,9 @@ def NDVI(tile_x, tile_y, date):
 
 # The initial release contains only one tile, so lets hardcode its location
 # here.  When you have more tiles, you can update this
-#TILE_X = 1536 # ranges from 1536 to 8704
-#TILE_Y = 1024 # ranges from 1024 to 10240
+TILE_X = 1536 # ranges from 1536 to 8704
+TILE_Y = 1024 # ranges from 1024 to 10240
+DATE = '2017-01-01'
 
 # The expected value of a Pixel in a mask file indicating that the pixel is
 # within that region.  Tuple value, (Red, Green, Blue, Alpha)
@@ -221,23 +224,26 @@ IS_IN_MASK_PIXEL_VALUE = (0, 0, 0, 255)
 TILE_WIDTH_PX = 512  
 TILE_HEIGHT_PX = 512  
 
-#start_arg_crop = {
-#    "tile_x":TILE_X,
-#    "tile_y":TILE_Y,
-#    "mask_type":'sugarcane',
-#    "img":'ndvi', # We want to crop the ndvi images, if else put tci or fci 
-#    "date":'2016-12-22'}
+start_arg_crop = {
+    "tile_x":TILE_X,
+    "tile_y":TILE_Y,
+    "mask_type":'sugarcane',
+    "img":'ndvi', # We want to crop the ndvi images, if else put tci or fci 
+    "date":DATE}
 
-#start_arg_img = {
-#    "tile_x":TILE_X,
-#    "tile_y":TILE_Y,
-#    "date":'2016-12-22'}
+start_arg_img = {
+    "tile_x":TILE_X,
+    "tile_y":TILE_Y,
+    "date":DATE}
 
 
 
 #NDVI(**start_arg_img)
 #TCI(**start_arg_img)
-#FCI(**start_arg_img)
+MODE = 3
+print('Printing fci for tile {},{}'.format(TILE_X,TILE_Y)
+      +' in {}'.format(DATE)+' in mode {}.'.format(MODE))
+FCI(**start_arg_img,mode=MODE)
 
 #save_cropped(**start_arg_crop)
 
