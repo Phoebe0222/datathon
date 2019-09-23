@@ -6,4 +6,8 @@ Pillow
 rasterio
 sentinelsat
 shapely
+earthengine-api
+
+
+
 
