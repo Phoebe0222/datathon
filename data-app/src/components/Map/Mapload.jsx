@@ -1,12 +1,9 @@
 import React from 'react';
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import turf from '@turf/turf';
-import ReactDOM from 'react-dom';
 import area_cal from '@turf/area';
 import centroid_cal from '@turf/centroid';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-import JSONPretty from 'react-json-pretty';
 import { FormGroup, Label, Input } from "reactstrap";
 
 var map;
@@ -95,8 +92,8 @@ export default class Mapload extends React.Component {
 
   }
   switchLayer(layer) {
-    var layerList = document.getElementById('menu');
-    var inputs = layerList.getElementsByTagName('input');
+    // var layerList = document.getElementById('menu');
+    // var inputs = layerList.getElementsByTagName('input');
     var layerId = layer.target.id;
     map.setStyle('mapbox://styles/mapbox/' + layerId);
   }
@@ -165,7 +162,7 @@ export default class Mapload extends React.Component {
 
   syntaxHighlight(json) {
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
       var cls = 'number';
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
@@ -229,7 +226,7 @@ export default class Mapload extends React.Component {
   }
 
   deleteArea(e) {
-    let data = draw.getAll();
+    // let data = draw.getAll();
     map.removeLayer('maine').removeSource('maine');
   }
   updateArea(e) {
