@@ -23,9 +23,10 @@ export default class Mapload extends React.Component {
     super(props)
     this.state = {
       lng: 133.8920,
-      lat: -25.0195,
+      lat: -25.7505,
       zoom: 3.4,
     }
+
     this.drawPolygon = this.drawPolygon.bind(this);
     this.createArea = this.createArea.bind(this);
     this.updateArea = this.updateArea.bind(this);
@@ -35,6 +36,7 @@ export default class Mapload extends React.Component {
   componentDidMount() {
     // global variables
     let { lat, lng, zoom } = this.state;
+
     // trying to access clinet's coordinates. pop up will appear asking for permission 
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(position => {
@@ -248,8 +250,9 @@ export default class Mapload extends React.Component {
   }
 
   updateArea(e) {
+    // TODO data.action 'change_coordinates', 'move'
     let data = draw.getAll();
-    // map.removeLayer(mapLayer).removeSource(mapSource);
+    console.log("LOG: updateArea(data)", data);
     countCreate = (parseInt(countCreate) - 1).toString(10);
     const polygonData = data.features[0].geometry.coordinates;
     this.drawPolygon(polygonData);
@@ -258,6 +261,9 @@ export default class Mapload extends React.Component {
   }
 
   deleteArea(e) {
+    let data = draw.getAll();
+    console.log("LOG: deleteArea(data)", data);
+    const polygonData = data.features[0];
     countCreate = (parseInt(countCreate) - 1).toString(10);
   }
 
