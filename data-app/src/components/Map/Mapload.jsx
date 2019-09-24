@@ -1,21 +1,26 @@
 import React from 'react';
-import mapboxgl from 'mapbox-gl';
+import MapboxGL from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import RulerControl from 'mapbox-gl-controls/lib/ruler';
 import StylesControl from 'mapbox-gl-controls/lib/styles';
 import CompassControl from 'mapbox-gl-controls/lib/compass';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
-import area_cal from '@turf/area';
-import centroid_cal from '@turf/centroid';
+import Area from '@turf/area';
+import Centroid from '@turf/centroid';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { FormGroup, Label, Input } from "reactstrap";
+import { polygons } from '@turf/helpers';
 
 var map;
 var draw;
+var polygon = '';
+var mapLayer = 'main-layer';
+var mapSource = 'main-source';
 let geo_json;
-var count_create = "0";
+var countCreate = "0";
+let coordinates_value;
+MapboxGL.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 export default class Mapload extends React.Component {
   constructor(props) {
     super(props)
@@ -28,16 +33,14 @@ export default class Mapload extends React.Component {
     this.drawPolygon = this.drawPolygon.bind(this);
     this.createArea = this.createArea.bind(this);
     this.updateArea = this.updateArea.bind(this);
-    // this.showPolygonData = this.showPolygonData.bind(this);
     this.polygonDataCalc = this.polygonDataCalc.bind(this);
-    // this.syntaxHighlight = this.syntaxHighlight.bind(this);
-    // this.changeMap = this.changeMap.bind(this);
-    // this.switchLayer = this.switchLayer.bind(this);
   }
 
   componentDidMount() {
+    // global variables
     let { lat, lng, zoom } = this.state;
 
+    // trying to access clinet's coordinates. pop up will appear asking for permission 
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(position => {
         lng = position.coords.longitude;
@@ -46,85 +49,55 @@ export default class Mapload extends React.Component {
       });
     }
 
-    map = new mapboxgl.Map({
+    // load the default map
+    map = new MapboxGL.Map({
       container: this.mapDiv,
       style: 'mapbox://styles/mapbox/streets-v10?optimize=true',
       center: [lng, lat],
-      zoom: zoom
+      zoom: zoom,
+      attributionControl: false
     });
 
+    map.on('draw.create', this.createArea);
+    map.on('draw.delete', this.deleteArea);
+    map.on('draw.update', this.updateArea);
+
+    this.addControls();
+    this.layeringMap("load");
+    this.fixAlignments();
+  }
+
+  addControls() {
+    // enable street view and satellite view
+    map.addControl(new StylesControl(), 'top-left');
+    // enbale mapbox draw controls (draw polygon, trash)
     draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
         polygon: true,
-        point: true,
         trash: true
       }
     });
-
+    map.addControl(draw, 'top-left');
+    // enbale map search box
     map.addControl(new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
+      accessToken: MapboxGL.accessToken,
       mapboxgl: map
     }));
-
-
-    // with custom styles:
-    map.addControl(new StylesControl({
-      styles: [
-        {
-          label: 'Streets',
-          styleName: 'Mapbox Streets',
-          styleUrl: 'mapbox://styles/mapbox/streets-v9',
-        }, {
-          label: 'Satellite',
-          styleName: 'Satellite',
-          styleUrl: 'mapbox://styles/mapbox/satellite-v9',
-        },
-      ],
-      onChange: (style) => console.log(style),
-    }), 'top-left');
-    map.addControl(draw, 'top-left');
-
-
-    map.addControl(new mapboxgl.GeolocateControl({
+    // enable get current location control
+    map.addControl(new MapboxGL.GeolocateControl({
       positionOptions: {
         enableHighAccuracy: true
       },
       trackUserLocation: true
     }));
-
+    // enable zoom control 
     map.addControl(new ZoomControl(), 'top-right');
+    // enable compass control
     map.addControl(new CompassControl(), 'top-right');
-
-    map.on('draw.create', this.createArea);
-    map.on('draw.delete', this.deleteArea);
-    map.on('draw.update', this.updateArea);
-    map.on('load', function () {
-      var mapCanvas = document.getElementsByClassName('mapboxgl-canvas')[0];
-      mapCanvas.style.width = '100%';
-      map.addLayer({
-        "id": "simple-tiles",
-        "type": "raster",
-        "source": {
-          "type": "raster",
-          "tiles": ["https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=874718354841f0e0250b4b06a05a971e"],
-          "tileSize": 256
-        },
-        "minzoom": 0,
-        "maxzoom": 22
-      });
-    });
-
-  }
-  switchLayer(layer) {
-    // var layerList = document.getElementById('menu');
-    // var inputs = layerList.getElementsByTagName('input');
-    var layerId = layer.target.id;
-    map.setStyle('mapbox://styles/mapbox/' + layerId);
   }
 
-  changeMap(e) {
-    console.log("Entered")
+  layeringMap(e) {
     map.on(e, function () {
       map.addLayer({
         "id": "simple-tiles",
@@ -140,84 +113,51 @@ export default class Mapload extends React.Component {
     });
   }
 
-  drawPolygon(points) {
-    map.addLayer({
-      'id': 'maine',
-      'type': 'fill',
-      'source': {
-        'type': 'geojson',
-        'data': {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Polygon',
-            'coordinates': points
-          }
-        }
-      },
-      'layout': {},
-      'paint': {
-        'fill-color': '#088',
-        'fill-opacity': 0.3
-      }
+  // fix css issue with width when loading the map 
+  fixAlignments() {
+    map.on('load', function () {
+      var mapCanvas = document.getElementsByClassName('mapboxgl-canvas')[0];
+      mapCanvas.style.width = '100%';
     });
   }
 
   createArea(e) {
     let data = draw.getAll();
-    console.log(data);
-    // if(count_create>0){
-    //   map.removeLayer('maine').removeSource('maine');
-    // }
-    // console.log(toString(count_create));
-    const polygonData = data.features[count_create].geometry.coordinates;
-    console.log("polygonData" + data);
+    console.log("LOG: (data)", data);
+    const polygonData = data.features[countCreate].geometry.coordinates;
+    console.log("LOG: (polygonData)", polygonData);
     this.drawPolygon(polygonData);
-    // } 
-    // else{
-    //             const polygonData = data.features[0].geometry.coordinates;
-    // console.log("polygonData"+polygonData);
-    // this.drawPolygon(polygonData);
-    // }  
-
-
-    this.polygonDataCalc(data);
-    count_create = (parseInt(count_create) + 1).toString(10);
-    console.log(count_create);
+    //this.polygonDataCalc(data);
+    countCreate = (parseInt(countCreate) + 1).toString(10);
+    console.log("LOG: (polygonCountCreate)", countCreate);
   }
 
-  syntaxHighlight(json) {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
-      var cls = 'number';
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          cls = 'key';
-        } else {
-          cls = 'string';
-        }
-      } else if (/true|false/.test(match)) {
-        cls = 'boolean';
-      } else if (/null/.test(match)) {
-        cls = 'null';
-      }
-      return '<span class="' + cls + '">' + match + '</span>';
-    });
+  updateArea(e) {
+    let data = draw.getAll();
+    map.removeLayer(mapLayer).removeSource(mapSource);
+    const polygonData = data.features[0].geometry.coordinates;
+    this.drawPolygon(polygonData);
+    //this.polygonDataCalc(data);
+  }
+
+  deleteArea(e) {
+    map.removeLayer(mapLayer).removeSource(mapSource);
   }
 
   polygonDataCalc(data) {
     if (data.features.length > 0) {
-      let area = area_cal(data);
-      // console.log(data);
-      let centroid = centroid_cal(data);
+      let area = Area(data);
+      let centroid = Centroid(data);
       let rounded_area = Math.round(area * 100) / 100;
-      console.log(data.features["0"].geometry);
-      let coordinates_value = data.features[count_create].geometry.coordinates["0"];
+      console.log("Data Featres ", data.features["0"])
+      console.log("Geometry ", data.features["0"].geometry);
+      coordinates_value = data.features[countCreate].geometry.coordinates["0"];
       // console.log(data.features["0"].geometry.coordinates["0"]["0"]);
       // console.log(coordinates_value);
       // let coordinates_value_json = JSON.stringify(coordinates_value, undefined, 4);
       console.log(coordinates_value)
       geo_json = {
-        Feature: data.features[count_create].geometry.type,
+        Feature: data.features[countCreate].geometry.type,
         Coordinates: coordinates_value,
         Centroid: centroid.geometry.coordinates,
         Area: rounded_area + "sq.m"
@@ -227,7 +167,6 @@ export default class Mapload extends React.Component {
         // coordinates3:coordinates_value[2]
       }
       console.log(JSON.stringify(geo_json))
-
 
       let geo_json_stringified = JSON.stringify(geo_json, undefined, 2)
       // this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
@@ -250,28 +189,78 @@ export default class Mapload extends React.Component {
     }
   }
 
-  deleteArea(e) {
-    // let data = draw.getAll();
-    map.removeLayer('maine').removeSource('maine');
+  syntaxHighlight(json) {
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
+      var cls = 'number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'key';
+        } else {
+          cls = 'string';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'boolean';
+      } else if (/null/.test(match)) {
+        cls = 'null';
+      }
+      return '<span class="' + cls + '">' + match + '</span>';
+    });
   }
-  updateArea(e) {
-    let data = draw.getAll();
-    map.removeLayer('maine').removeSource('maine');
-    const polygonData = data.features[0].geometry.coordinates;
-    this.drawPolygon(polygonData);
-    this.polygonDataCalc(data);
+
+  // add polygon layer  
+  drawPolygon(points) {
+    console.log("LOG: (points without stringify)", points[0]);
+    console.log("LOG: (points)", JSON.stringify(points[0]));
+
+    if (map.getLayer(mapLayer)) {
+      // if layer exists remove map layer & source.
+      map.removeLayer(mapLayer).removeSource(mapSource);
+      // if this is not the first polygon add the new polygon with a comma
+      polygon = polygon + ',';
+    }
+
+    polygon =
+      '{' +
+      '"type": "Feature",' +
+      '"geometry": {' +
+      '"type": "Point",' +
+      '"coordinates":' + JSON.stringify(points[0]) +
+      '}' +
+      '}';
+
+    var polygonSource = '{' +
+      '"type": "geojson",' +
+      '"data": {' +
+      '"type": "FeatureCollection",' +
+      '"features": [' + polygon + ']' +
+      '}}';
+    console.log("LOG: (polygonSource)", polygonSource);
+
+    var polygonLayer =
+      '{"id": "' + mapLayer + '",' +
+      '"type": "fill",' +
+      '"source": "' + mapSource + '",' +
+      '"paint": {' +
+      '   "fill-color": "#088",' +
+      '   "fill-opacity": 0.3' +
+      '}}';
+    console.log("LOG: (polygonLayer)", polygonLayer);
+
+    var objPolygonSource = JSON.parse(polygonSource);
+    var objPolygonLayer = JSON.parse(polygonLayer);
+    console.log("LOG: (objPolygonSource)", objPolygonSource);
+    console.log("LOG: (objPolygonLayer)", objPolygonLayer);
+
+    map.addSource(mapSource, objPolygonSource);
+    map.addLayer(objPolygonLayer);
   }
 
   render() {
     return (
       <div>
-
         <div ref={e => this.mapDiv = e} className="map"></div>
-        {/* <div><button onClick = { this.changeMap }></button></div> */}
-
-        <div className='calculation-box'>
-          <div id='calculated-area' ref={el => this.polygonDiv = el}>
-          </div>
+        <div id='calculated-area' ref={el => this.polygonDiv = el}>
         </div>
       </div>
     )
