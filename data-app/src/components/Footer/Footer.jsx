@@ -8,23 +8,23 @@ import { Container, Row, Nav, NavItem, NavLink } from "reactstrap";
 
 class Footer extends React.Component {
   render() {
-        return (
-          <footer className="footer">
-            <Container fluid>
-              <Nav>
-                <NavItem>
-                  <NavLink href="/aboutus">About Us</NavLink>
-                </NavItem>
-              </Nav>
-              <div className="copyright">
-                © {new Date().getFullYear()}
-                <a
-                  href="javascript:void(0)"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                ></a>{" "}
-              </div>
-            </Container>
+    return (
+      <footer className="footer">
+        <Container fluid>
+          <Nav>
+            <NavItem>
+              <NavLink href="/aboutus">About Us</NavLink>
+            </NavItem>
+          </Nav>
+          <div className="copyright">
+            © {new Date().getFullYear()}
+            <a
+              href=""
+              rel="noopener noreferrer"
+              target="_blank"
+            ></a>{" "}
+          </div>
+        </Container>
       </footer>
     );
   }

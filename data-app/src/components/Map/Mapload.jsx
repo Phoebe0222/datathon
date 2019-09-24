@@ -13,13 +13,14 @@ import { polygons } from '@turf/helpers';
 
 var map;
 var draw;
-var polygon = '';
+var polygonList = '';
 var mapLayer = 'main-layer';
 var mapSource = 'main-source';
+MapboxGL.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+
 let geo_json;
 var countCreate = "0";
 let coordinates_value;
-MapboxGL.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 export default class Mapload extends React.Component {
   constructor(props) {
@@ -121,12 +122,80 @@ export default class Mapload extends React.Component {
     });
   }
 
+  // add polygon layer  
+  drawPolygon(points) {
+    console.log("LOG: (points without stringify)", points[0]);
+    console.log("LOG: (points)", JSON.stringify(points[0]));
+
+    if (map.getLayer(mapLayer)) {
+      // if layer exists remove map layer & source.
+      map.removeLayer(mapLayer).removeSource(mapSource);
+      // if this is not the first polygon add the new polygon with a comma
+      polygonList += ',';
+    }
+
+    // create feature list with an unique id for GEOJSON
+    polygonList = polygonList +
+      '{' +
+      '"type": "Feature",' +
+      '"id": "feature' + countCreate + '",' +
+      '"geometry": {' +
+      '"type": "Point",' +
+      '"coordinates":' + JSON.stringify(points) +
+      '}' +
+      '}';
+    console.log("LOG: (polygonList)", polygonList);
+
+    // create above feature list to feature collection for GEOJSON
+    var polygonSource = '{' +
+      '"type": "geojson",' +
+      '"data": {' +
+      '"type": "FeatureCollection",' +
+      '"features": [' + polygonList + ']' +
+      '}}';
+    console.log("LOG: (polygonSource)", polygonSource);
+
+    // GEOJSON structure/ layer
+    var polygonLayer =
+      '{"id": "' + mapLayer + '",' +
+      '"type": "fill",' +
+      '"source": "' + mapSource + '",' +
+      '"paint": {' +
+      '   "fill-color": "#088",' +
+      '   "fill-opacity": 0.3' +
+      '}}';
+    console.log("LOG: (polygonLayer)", polygonLayer);
+
+    // convert string to JSON
+    var objPolygonSource = JSON.parse(polygonSource);
+    var objPolygonLayer = JSON.parse(polygonLayer);
+    console.log("LOG: (objPolygonSource)", objPolygonSource);
+    console.log("LOG: (objPolygonLayer)", objPolygonLayer);
+
+    // add source layer to map
+    map.addSource(mapSource, objPolygonSource);
+    // add main layer to map
+    map.addLayer(objPolygonLayer);
+  }
+
+  // TODO
+  deleteFeature(geoJSON, id) {
+    var path = 'source,data,type,features,id';
+    for (var i = 0; i < path.length - 1; i++) {
+      geoJSON = geoJSON[path[i]];
+      console.log("LOG: (geoJSON)", geoJSON);
+      if (typeof geoJSON === 'undefined') {
+        return;
+      }
+    }
+    //delete geoJSON[path.pop()];
+  }
+
   createArea(e) {
     let data = draw.getAll();
     console.log("LOG: (data)", data);
-    const polygonData = data.features[countCreate].geometry.coordinates;
-    console.log("LOG: (polygonData)", polygonData);
-    this.drawPolygon(polygonData);
+    const polygonCoordinates = data.features[countCreate].geometry.coordinates;
+    this.drawPolygon(polygonCoordinates);
     //this.polygonDataCalc(data);
     countCreate = (parseInt(countCreate) + 1).toString(10);
     console.log("LOG: (polygonCountCreate)", countCreate);
@@ -206,54 +275,6 @@ export default class Mapload extends React.Component {
       }
       return '<span class="' + cls + '">' + match + '</span>';
     });
-  }
-
-  // add polygon layer  
-  drawPolygon(points) {
-    console.log("LOG: (points without stringify)", points[0]);
-    console.log("LOG: (points)", JSON.stringify(points[0]));
-
-    if (map.getLayer(mapLayer)) {
-      // if layer exists remove map layer & source.
-      map.removeLayer(mapLayer).removeSource(mapSource);
-      // if this is not the first polygon add the new polygon with a comma
-      polygon = polygon + ',';
-    }
-
-    polygon =
-      '{' +
-      '"type": "Feature",' +
-      '"geometry": {' +
-      '"type": "Point",' +
-      '"coordinates":' + JSON.stringify(points[0]) +
-      '}' +
-      '}';
-
-    var polygonSource = '{' +
-      '"type": "geojson",' +
-      '"data": {' +
-      '"type": "FeatureCollection",' +
-      '"features": [' + polygon + ']' +
-      '}}';
-    console.log("LOG: (polygonSource)", polygonSource);
-
-    var polygonLayer =
-      '{"id": "' + mapLayer + '",' +
-      '"type": "fill",' +
-      '"source": "' + mapSource + '",' +
-      '"paint": {' +
-      '   "fill-color": "#088",' +
-      '   "fill-opacity": 0.3' +
-      '}}';
-    console.log("LOG: (polygonLayer)", polygonLayer);
-
-    var objPolygonSource = JSON.parse(polygonSource);
-    var objPolygonLayer = JSON.parse(polygonLayer);
-    console.log("LOG: (objPolygonSource)", objPolygonSource);
-    console.log("LOG: (objPolygonLayer)", objPolygonLayer);
-
-    map.addSource(mapSource, objPolygonSource);
-    map.addLayer(objPolygonLayer);
   }
 
   render() {
