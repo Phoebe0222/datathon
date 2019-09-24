@@ -196,7 +196,7 @@ export default class Mapload extends React.Component {
     console.log("LOG: (data)", data);
     const polygonCoordinates = data.features[countCreate].geometry.coordinates;
     this.drawPolygon(polygonCoordinates);
-    //this.polygonDataCalc(data);
+    this.polygonDataCalc(data);
     countCreate = (parseInt(countCreate) + 1).toString(10);
     console.log("LOG: (polygonCountCreate)", countCreate);
   }
@@ -206,11 +206,12 @@ export default class Mapload extends React.Component {
     map.removeLayer(mapLayer).removeSource(mapSource);
     const polygonData = data.features[0].geometry.coordinates;
     this.drawPolygon(polygonData);
-    //this.polygonDataCalc(data);
+    this.polygonDataCalc(data);
   }
 
   deleteArea(e) {
     map.removeLayer(mapLayer).removeSource(mapSource);
+    countCreate = (parseInt(countCreate) - 1).toString(10);
   }
 
   polygonDataCalc(data) {
