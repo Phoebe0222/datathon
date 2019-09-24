@@ -203,14 +203,19 @@ export default class Mapload extends React.Component {
 
   updateArea(e) {
     let data = draw.getAll();
-    map.removeLayer(mapLayer).removeSource(mapSource);
+    // map.removeLayer(mapLayer).removeSource(mapSource);
+    countCreate = (parseInt(countCreate) - 1).toString(10);
     const polygonData = data.features[0].geometry.coordinates;
     this.drawPolygon(polygonData);
     this.polygonDataCalc(data);
+    countCreate = (parseInt(countCreate) + 1).toString(10);
   }
 
   deleteArea(e) {
-    map.removeLayer(mapLayer).removeSource(mapSource);
+
+    // map.removeLayer(mapLayer).removeSource(mapSource);
+    // console.log(document.getElementById(countCreate));
+    // document.getElementById(countCreate).innerHTML = "";
     countCreate = (parseInt(countCreate) - 1).toString(10);
   }
 
@@ -245,6 +250,7 @@ export default class Mapload extends React.Component {
       console.log(typeof (geo_json_readable));
       // this.polygonDiv.innerHTML =+ '<pre>'+geo_json_readable+'</pre>';
       var pre_tag = document.createElement("PRE");
+      pre_tag.id = countCreate;
       var t = document.createTextNode(geo_json_stringified);
       pre_tag.appendChild(t);
       document.getElementById("calculated-area").appendChild(pre_tag);
