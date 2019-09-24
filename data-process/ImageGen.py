@@ -15,11 +15,23 @@ import subprocess
 import glob
 import os
 import numpy as np
+import pandas as pd
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import rasterio as rio
 from rasterio import plot
+
+
+# some initailisation param
+# The expected value of a Pixel in a mask file indicating that the pixel is
+# within that region.  Tuple value, (Red, Green, Blue, Alpha)
+IS_IN_MASK_PIXEL_VALUE = (0, 0, 0, 255)
+
+# Tile width / height in pixels
+TILE_WIDTH_PX = 512 
+TILE_HEIGHT_PX = 512 
+
 
 
 if not os.path.exists('./Data'):
@@ -32,14 +44,16 @@ def get_mask_path(tile_x, tile_y, mask_type): #mask_type is sugarcane coz it's i
     return path
 
 
-# Get a list of all the image tiles for a specific x,y coordinate
-# for the specified band
+# Get a path of band tile for a specific x,y coordinate
+# for the specified band and date
 def get_tiles_band_path(tile_x, tile_y, band, date):
     path = f"./data/tiles/{tile_x}-{tile_y}-{band}-{date}.png"
     #path = glob.glob(path) # a list of paths
     #path = path[0] # get the first date 
     return path 
 
+# Get a path of image tile for a specific x,y coordinate
+# for the specified image and date
 def get_img_path(tile_x, tile_y, img, date):
     path = f"./Output/{img}/{img}-{tile_x}-{tile_y}-{date}.png"
     return path 
@@ -48,7 +62,8 @@ def get_img_path(tile_x, tile_y, img, date):
 def get_image_pixels(path):
     img = Image.open(path)
     pixels = img.load() 
-    return pixels
+    SIZE = img.size
+    return pixels, SIZE
 
 def is_in_mask(mask_pixels, pixel_x, pixel_y):
     if mask_pixels[pixel_x,pixel_y] == IS_IN_MASK_PIXEL_VALUE: # the pixel in the mask file is black 
@@ -56,16 +71,17 @@ def is_in_mask(mask_pixels, pixel_x, pixel_y):
     else:
         return False
 
-    
+# get the pixels from cropped image    
 def get_cropped_pixels(tile_x, tile_y, mask_type, img, date):
     
     # get the pixels from mask and image 
-    mask_pixels = get_image_pixels(get_mask_path(tile_x, tile_y, mask_type))
-    image_pixels = get_image_pixels(get_img_path(tile_x, tile_y, img, date))
+    mask = get_image_pixels(get_mask_path(tile_x, tile_y, mask_type))
+    mask_pixels = mask[0]
+    image = get_image_pixels(get_img_path(tile_x, tile_y, img, date))
+    image_pixels = image[0]
     
-    
-    width = TILE_WIDTH_PX 
-    height = TILE_HEIGHT_PX 
+    width = mask[1][0] 
+    height = mask[1][1]  
 
     for x in range(0, width):
         for y in range(0, height):
@@ -82,9 +98,9 @@ def get_cropped_pixels(tile_x, tile_y, mask_type, img, date):
     return cropped_pixels
     
 
+# put the pixels from the cropped images in a sequence 
 def sequence_cropped_pixels(tile_x, tile_y, mask_type, img, date):
-    
-    # get the pixels from cropped
+        
     cropped_pixels = get_cropped_pixels(tile_x, tile_y, mask_type, img, date)
 
     cropped_sequence = []
@@ -97,9 +113,8 @@ def sequence_cropped_pixels(tile_x, tile_y, mask_type, img, date):
             # flipping the image coz of the way load() reads pixels
     return cropped_sequence
 
-
+# save the cropped images in png format from a sequence of pixels
 def save_cropped(tile_x, tile_y, mask_type, img, date):
-    #img is the path to the saved image from the NDVI-
     cropped = Image.new("RGBA", (512, 512))
     cropped.putdata(sequence_cropped_pixels(tile_x, tile_y, mask_type, img, date))
     #cropped.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
@@ -109,11 +124,42 @@ def save_cropped(tile_x, tile_y, mask_type, img, date):
     return cropped
 
 
+# puting mask pixels in 0 or 1 (in mask or not in mask) values for model training purpose 
+def get_mask_pixels(tile_x, tile_y,mask_type='sugarcane'):
+    
+    # get the pixels from mask 
+    mask = get_image_pixels(get_mask_path(tile_x, tile_y, mask_type))
+    mask_pixels = mask[0]
+    
+    width = mask[1][0] 
+    height = mask[1][1]  
+    mask_sequence = []
+
+    for x in range(0, width):
+        for y in range(0, height):
+
+            # is the pixel in my mask?
+            in_mask = is_in_mask(mask_pixels, y, x)
+            if in_mask:
+                mask_sequence.append(1)
+            else:
+                mask_sequence.append(0) #if not in mask, change to transparent
+                
+    mask = Image.new("I", (width, height))
+    mask.putdata(mask_sequence)
+    #mask.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
+    if not os.path.exists('./ModelTrainingData/label'):
+        os.makedirs('./ModelTrainingData/label')
+    mask.save(f'./ModelTrainingData/label/mask-{tile_x}-{tile_y}.png')
+    #print("mask-{}-{}".format(tile_x,tile_y)+" is saved")
+    return mask_sequence
+    
+
 def normalize(array):
     array_min, array_max = array.min(), array.max()
     return ((array - array_min)/(array_max - array_min))
 
-# get band pixels, setting ceopped = Ture to use cropped bands 
+# get band pixels
 def get_band(tile_x, tile_y, date, band):
     path = get_tiles_band_path(tile_x, tile_y, band, date)
     
@@ -125,6 +171,7 @@ def get_band(tile_x, tile_y, date, band):
 
     return get_band
 
+# create true color images
 def TCI(tile_x, tile_y, date):
     get_blue = get_band(tile_x, tile_y, date, band='B02')
     b2 = get_blue['b']; blue = get_blue['read']
@@ -143,13 +190,15 @@ def TCI(tile_x, tile_y, date):
     
     return tci
 
+# create histogram of different bands from tci
 def tci_hist(tile_x, tile_y, date):
     #generate histogram
     trueColor = rio.open(f'./Output/tci/tci-{tile_x}-{tile_y}-{date}.png', count=3)
     plot.show_hist(trueColor, bins=50, lw=0.0, stacked=False, 
                    alpha=0.3, histtype='stepfilled', title="Histogram")
 
-    
+
+# create false color images (there are 3 modes)
 def FCI(tile_x, tile_y, date, mode=1):
     get_blue = get_band(tile_x, tile_y, date, band='B02')
     b2 = get_blue['b']; blue = get_blue['read']
@@ -185,6 +234,7 @@ def FCI(tile_x, tile_y, date, mode=1):
     return fci
 
 
+# create ndvi map
 def NDVI(tile_x, tile_y, date):
     get_red = get_band(tile_x, tile_y, date, band='B04')
     red = get_red['read']
@@ -210,19 +260,34 @@ def NDVI(tile_x, tile_y, date):
     return ndvi
 
 
-# The initial release contains only one tile, so lets hardcode its location
-# here.  When you have more tiles, you can update this
+# generate tile ids 
+def tile_id_gen():
+    if not os.path.exists('./ModelTrainingData'):
+        os.makedirs('./ModelTrainingData')
+    subprocess.run("ls ./ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique > TileIds.txt",shell=True)
+    f = open("./ModelTrainingData/TileIds.txt")
+    count = int(subprocess.run("ls ./ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique | wc -l", stdout=subprocess.PIPE,shell=True).stdout.decode('utf-8'))
+    
+    tile_x = []
+    tile_y = []
+    img = []
+    
+    print("Creating the Data list .....")
+    
+    for x in f:
+        tile_x.append(str(x).split("-",1)[0])
+        tile_y.append(str(x).split("-",1)[1].replace("\n",""))
+    print('{} tiles ids are created'.format(count))    
+    return tile_x, tile_y,count
+
+
+
+
+# just trying with one tile 
 TILE_X = 1536 # ranges from 1536 to 8704
 TILE_Y = 1024 # ranges from 1024 to 10240
 DATE = '2017-01-01'
 
-# The expected value of a Pixel in a mask file indicating that the pixel is
-# within that region.  Tuple value, (Red, Green, Blue, Alpha)
-IS_IN_MASK_PIXEL_VALUE = (0, 0, 0, 255)
-
-# Tile width / height in pixels
-TILE_WIDTH_PX = 512  
-TILE_HEIGHT_PX = 512  
 
 start_arg_crop = {
     "tile_x":TILE_X,
