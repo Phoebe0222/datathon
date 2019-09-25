@@ -7,9 +7,6 @@
 ## Library for dependent scripts (tile-and-mask-generation.py)
 
 
-#import subprocess 
-#subprocess.run("pip install -r requirements.txt")
-
 #pip install -r requirements.txt
 
 import math
@@ -88,6 +85,7 @@ def GetFourPositions(x,y):
     return [top_left_pos,top_right_pos,bottom_right_pos, bottom_left_pos]
 
 
+############### testing part #####################
 if __name__ == "__main__":
     lat_long_a=(-19.893321306346,147.9552989984)
     lat_long_b=(-19.884605137462 ,149.00386329475)
