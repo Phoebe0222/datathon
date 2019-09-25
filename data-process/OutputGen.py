@@ -15,7 +15,7 @@ def tile_name_gen():
     tile_y = []
     date = []
     
-    print("Crating the Data list .....")
+    print("Crating the tile names list .....")
     
     for x in f:
         tile_x.append(str(x).split("-",2)[0])
@@ -26,9 +26,12 @@ def tile_name_gen():
     return tile_x, tile_y, date, count
 
 
+
+
+#####################  Generate NDVI, FCI, FCI for each tile #####################
+
 tile_x, tile_y, date, count = tile_name_gen()
 
-#####################  Generate NDVI, FCI, FCI  #####################
 print("Generating Images .....")
 
 for i in range(count):
@@ -45,14 +48,14 @@ for i in range(count):
         "date":date[i]}
 
     ImageGen.NDVI(**start_arg_img)
-    #print("NDVI {} Done".format(i))
+    print("{} NDVI Done".format(count))
     ImageGen.TCI(**start_arg_img)
-    #print("TCI {} Done".format(i))
+    print("{} TCI Done".format(count))
     ImageGen.FCI(**start_arg_img)
-    #print("FCI {} Done".format(i))
+    print("{} FCI Done".format(count))
     
-    ImageGen.save_cropped(**start_arg_crop)
-    #print("Cropped {} Done".format(i))
+    #ImageGen.save_cropped(**start_arg_crop)
+    #print("{} Cropped Done".format(count))
     
 print("Done")
 ####################################################################################################
