@@ -1,13 +1,12 @@
 ##################################################################################
-#  Script to gnerate cropped bands, combine (cropped) bands to generate TCI, FCI #
+#  Library for dependent scripts (OutputGen.py, UNET.py)                         #
+#  creates training labels                                                       #
 #  save_cropped works for per tile, per date, per band                           #
 #  TCI requires bands 2,3,4, and works for per tile, per date                    #
 #  FCI requires bands 2,3,4,8,10,11,12, and works for per tile, per date         #  
 #  NVDI requires band 3,4,8, and works for per tile, per date                    #
 ##################################################################################
 
-
-## Library for dependent scripts (OutputGen.py, UNET.py)
 
 # pip install -r requirements.txt
 
@@ -264,51 +263,29 @@ def NDVI(tile_x, tile_y, date):
 def tile_id_gen():
     if not os.path.exists('./ModelTrainingData'):
         os.makedirs('./ModelTrainingData')
+    # grab ids from tci image filenames 
     subprocess.run("ls ./ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique > TileIds.txt",shell=True)
-    f = open("./ModelTrainingData/TileIds.txt")
+    # count the number of ids 
     count = int(subprocess.run("ls ./ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique | wc -l", stdout=subprocess.PIPE,shell=True).stdout.decode('utf-8'))
     
     tile_x = []
     tile_y = []
     img = []
     
-    print("Creating the Data list .....")
-    
+    print("Creating the tile id list .....")
+    f = open("./ModelTrainingData/TileIds.txt")
     for x in f:
         tile_x.append(str(x).split("-",1)[0])
         tile_y.append(str(x).split("-",1)[1].replace("\n",""))
-    print('{} tiles ids are created'.format(count))    
+    print('{} tiles ids are created and saved in TileIds.txt'.format(count))    
     return tile_x, tile_y,count
 
 
 
-
-# just trying with one tile 
-TILE_X = 1536 # ranges from 1536 to 8704
-TILE_Y = 1024 # ranges from 1024 to 10240
-DATE = '2017-01-01'
-
-
-start_arg_crop = {
-    "tile_x":TILE_X,
-    "tile_y":TILE_Y,
-    "mask_type":'sugarcane',
-    "img":'ndvi', # We want to crop the ndvi images, if else put tci or fci 
-    "date":DATE}
-
-start_arg_img = {
-    "tile_x":TILE_X,
-    "tile_y":TILE_Y,
-    "date":DATE}
-
-
-
-#NDVI(**start_arg_img)
-#TCI(**start_arg_img)
-MODE = 3
-print('Printing fci for tile {},{}'.format(TILE_X,TILE_Y)
-      +' in {}'.format(DATE)+' in mode {}.'.format(MODE))
-FCI(**start_arg_img,mode=MODE)
-
-#save_cropped(**start_arg_crop)
+# creating (0,1) masks 
+tile_x, tile_y, count= tile_id_gen()
+print("Generating {} masks .....".format(count))
+for i in range(count):
+    get_mask_pixels(tile_x[i], tile_y[i],mask_type='sugarcane')
+print("all {} masks are saved in label folder".format(count))
 
