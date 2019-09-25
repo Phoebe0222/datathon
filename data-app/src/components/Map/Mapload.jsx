@@ -1,15 +1,12 @@
 import React from 'react';
 import MapboxGL from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import RulerControl from 'mapbox-gl-controls/lib/ruler';
 import StylesControl from 'mapbox-gl-controls/lib/styles';
 import CompassControl from 'mapbox-gl-controls/lib/compass';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import Area from '@turf/area';
 import Centroid from '@turf/centroid';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-import { FormGroup, Label, Input } from "reactstrap";
-import { polygons } from '@turf/helpers';
 
 var map;
 var draw;
@@ -18,16 +15,15 @@ var mapLayer = 'main-layer';
 var mapSource = 'main-source';
 MapboxGL.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
-let geo_json;
+let geoJSON;
 var countCreate = "0";
-let coordinates_value;
 
 export default class Mapload extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       lng: 133.8920,
-      lat: -25.0195,
+      lat: -25.7505,
       zoom: 3.4,
     }
 
@@ -64,13 +60,14 @@ export default class Mapload extends React.Component {
     map.on('draw.update', this.updateArea);
 
     this.addControls();
-    this.layeringMap("load");
+    this.mapLayer("load");
     this.fixAlignments();
   }
 
   addControls() {
     // enable street view and satellite view
     map.addControl(new StylesControl(), 'top-left');
+
     // enbale mapbox draw controls (draw polygon, trash)
     draw = new MapboxDraw({
       displayControlsDefault: false,
@@ -80,11 +77,13 @@ export default class Mapload extends React.Component {
       }
     });
     map.addControl(draw, 'top-left');
+
     // enbale map search box
     map.addControl(new MapboxGeocoder({
       accessToken: MapboxGL.accessToken,
       mapboxgl: map
     }));
+
     // enable get current location control
     map.addControl(new MapboxGL.GeolocateControl({
       positionOptions: {
@@ -92,13 +91,15 @@ export default class Mapload extends React.Component {
       },
       trackUserLocation: true
     }));
+
     // enable zoom control 
     map.addControl(new ZoomControl(), 'top-right');
+
     // enable compass control
     map.addControl(new CompassControl(), 'top-right');
   }
 
-  layeringMap(e) {
+  mapLayer(e) {
     map.on(e, function () {
       map.addLayer({
         "id": "simple-tiles",
@@ -114,7 +115,7 @@ export default class Mapload extends React.Component {
     });
   }
 
-  // fix css issue with width when loading the map 
+  // fix css issue of width when loading the map 
   fixAlignments() {
     map.on('load', function () {
       var mapCanvas = document.getElementsByClassName('mapboxgl-canvas')[0];
@@ -124,8 +125,8 @@ export default class Mapload extends React.Component {
 
   // add polygon layer  
   drawPolygon(points) {
-    console.log("LOG: (points without stringify)", points[0]);
-    console.log("LOG: (points)", JSON.stringify(points[0]));
+    console.log("LOG: drawPolygon(points without stringify)", points[0]);
+    console.log("LOG: drawPolygon(points)", JSON.stringify(points[0]));
 
     if (map.getLayer(mapLayer)) {
       // if layer exists remove map layer & source.
@@ -133,7 +134,6 @@ export default class Mapload extends React.Component {
       // if this is not the first polygon add the new polygon with a comma
       polygonList += ',';
     }
-
     // create feature list with an unique id for GEOJSON
     polygonList = polygonList +
       '{' +
@@ -144,7 +144,7 @@ export default class Mapload extends React.Component {
       '"coordinates":' + JSON.stringify(points) +
       '}' +
       '}';
-    console.log("LOG: (polygonList)", polygonList);
+    console.log("LOG: drawPolygon(polygonList)", polygonList);
 
     // create above feature list to feature collection for GEOJSON
     var polygonSource = '{' +
@@ -153,7 +153,7 @@ export default class Mapload extends React.Component {
       '"type": "FeatureCollection",' +
       '"features": [' + polygonList + ']' +
       '}}';
-    console.log("LOG: (polygonSource)", polygonSource);
+    console.log("LOG: drawPolygon(polygonSource)", polygonSource);
 
     // GEOJSON structure/ layer
     var polygonLayer =
@@ -164,13 +164,13 @@ export default class Mapload extends React.Component {
       '   "fill-color": "#088",' +
       '   "fill-opacity": 0.3' +
       '}}';
-    console.log("LOG: (polygonLayer)", polygonLayer);
+    console.log("LOG: drawPolygon(polygonLayer)", polygonLayer);
 
     // convert string to JSON
     var objPolygonSource = JSON.parse(polygonSource);
     var objPolygonLayer = JSON.parse(polygonLayer);
-    console.log("LOG: (objPolygonSource)", objPolygonSource);
-    console.log("LOG: (objPolygonLayer)", objPolygonLayer);
+    console.log("LOG: drawPolygon(objPolygonSource)", objPolygonSource);
+    console.log("LOG: drawPolygon(objPolygonLayer)", objPolygonLayer);
 
     // add source layer to map
     map.addSource(mapSource, objPolygonSource);
@@ -178,90 +178,32 @@ export default class Mapload extends React.Component {
     map.addLayer(objPolygonLayer);
   }
 
-  // TODO
-  deleteFeature(geoJSON, id) {
-    var path = 'source,data,type,features,id';
-    for (var i = 0; i < path.length - 1; i++) {
-      geoJSON = geoJSON[path[i]];
-      console.log("LOG: (geoJSON)", geoJSON);
-      if (typeof geoJSON === 'undefined') {
-        return;
-      }
-    }
-    //delete geoJSON[path.pop()];
-  }
-
-  createArea(e) {
-    let data = draw.getAll();
-    console.log("LOG: (data)", data);
-    const polygonCoordinates = data.features[countCreate].geometry.coordinates;
-    this.drawPolygon(polygonCoordinates);
-    this.polygonDataCalc(data);
-    countCreate = (parseInt(countCreate) + 1).toString(10);
-    console.log("LOG: (polygonCountCreate)", countCreate);
-  }
-
-  updateArea(e) {
-    let data = draw.getAll();
-    // map.removeLayer(mapLayer).removeSource(mapSource);
-    countCreate = (parseInt(countCreate) - 1).toString(10);
-    const polygonData = data.features[0].geometry.coordinates;
-    this.drawPolygon(polygonData);
-    this.polygonDataCalc(data);
-    countCreate = (parseInt(countCreate) + 1).toString(10);
-  }
-
-  deleteArea(e) {
-
-    // map.removeLayer(mapLayer).removeSource(mapSource);
-    // console.log(document.getElementById(countCreate));
-    // document.getElementById(countCreate).innerHTML = "";
-    countCreate = (parseInt(countCreate) - 1).toString(10);
-  }
-
   polygonDataCalc(data) {
     if (data.features.length > 0) {
       let area = Area(data);
       let centroid = Centroid(data);
-      let rounded_area = Math.round(area * 100) / 100;
-      console.log("Data Featres ", data.features["0"])
-      console.log("Geometry ", data.features["0"].geometry);
-      coordinates_value = data.features[countCreate].geometry.coordinates["0"];
-      // console.log(data.features["0"].geometry.coordinates["0"]["0"]);
-      // console.log(coordinates_value);
-      // let coordinates_value_json = JSON.stringify(coordinates_value, undefined, 4);
-      console.log(coordinates_value)
-      geo_json = {
-        Feature: data.features[countCreate].geometry.type,
-        Coordinates: coordinates_value,
-        Centroid: centroid.geometry.coordinates,
-        Area: rounded_area + "sq.m"
-        // coordinates:{coordinates1:coordinates_value[0],coordinates2:coordinates_value[1],coordinates3:coordinates_value[2]}
-        // coordinates:coordinates_value[0],
-        // coordinates2:coordinates_value[1],
-        // coordinates3:coordinates_value[2]
+      let roundedArea = Math.round(area * 100) / 100;
+      let featureType = data.features[countCreate].geometry.type;
+      let coordinatesValue = data.features[countCreate].geometry.coordinates["0"];
+      console.log("LOG: polygonDataCalc(data featres)", data.features["0"])
+      console.log("LOG: polygonDataCalc(geometry)", data.features["0"].geometry);
+      console.log("LOG: polygonDataCalc(coordinatesValue)", coordinatesValue)
+      geoJSON = {
+        feature: featureType,
+        coordinates: coordinatesValue,
+        centroid: centroid.geometry.coordinates,
+        area: roundedArea + " sq.m"
       }
-      console.log(JSON.stringify(geo_json))
-
-      let geo_json_stringified = JSON.stringify(geo_json, undefined, 2)
-      // this.polygonDiv.innerHTML = '<p><b><strong>Area: ' + rounded_area + ' square meter</strong></b></p><p><b><strong>Centroid: '+
-      //     centroid.geometry.coordinates+' </strong></b></p>'+lat_val;
-      let geo_json_readable = this.syntaxHighlight(geo_json_stringified);
-      console.log(typeof (geo_json_readable));
-      // this.polygonDiv.innerHTML =+ '<pre>'+geo_json_readable+'</pre>';
-      var pre_tag = document.createElement("PRE");
-      pre_tag.id = countCreate;
-      var t = document.createTextNode(geo_json_stringified);
-      pre_tag.appendChild(t);
-      document.getElementById("calculated-area").appendChild(pre_tag);
-      // this.polygonDiv.innerHTML = coordinates_value_json[2];
-      // this.polygonDiv.innerHTML = '<JSONPretty id = "json-pretty"'
-      // this.polygonDiv.innerHTML = '<JSONPretty data = { geo_json }></JSONPretty>'
-      // console.log(trackUserLocation);
-      // document.write(lat_val);
-    }
-    else {
-      console.log("Drawn Area not fetched");
+      console.log("LOG: polygonDataCalc(geoJSON)", JSON.stringify(geoJSON))
+      let geoJSONStringified = JSON.stringify(geoJSON, undefined, 2)
+      let geoJSONReadable = this.syntaxHighlight(geoJSONStringified);
+      var preTag = document.createElement("pre");
+      var geoJSONTag = document.createTextNode(geoJSONStringified);
+      preTag.id = countCreate;
+      preTag.appendChild(geoJSONTag);
+      document.getElementById("geoJASON").appendChild(preTag);
+    } else {
+      console.log("LOG: error(drawn area not fetched)");
     }
   }
 
@@ -284,11 +226,52 @@ export default class Mapload extends React.Component {
     });
   }
 
+  // TODO
+  deleteFeature(geoJSON, id) {
+    var path = 'source,data,type,features,id';
+    for (var i = 0; i < path.length - 1; i++) {
+      geoJSON = geoJSON[path[i]];
+      console.log("LOG: deleteFeature(geoJSON)", geoJSON);
+      if (typeof geoJSON === 'undefined') {
+        return;
+      }
+    }
+    //delete geoJSON[path.pop()];
+  }
+
+  createArea(e) {
+    let data = draw.getAll();
+    console.log("LOG: createArea(data)", data);
+    const polygonCoordinates = data.features[countCreate].geometry.coordinates;
+    this.drawPolygon(polygonCoordinates);
+    this.polygonDataCalc(data);
+    countCreate = (parseInt(countCreate) + 1).toString(10);
+    console.log("LOG: createArea(polygonCountCreate)", countCreate);
+  }
+
+  updateArea(e) {
+    // TODO data.action 'change_coordinates', 'move'
+    let data = draw.getAll();
+    console.log("LOG: updateArea(data)", data);
+    countCreate = (parseInt(countCreate) - 1).toString(10);
+    const polygonData = data.features[0].geometry.coordinates;
+    this.drawPolygon(polygonData);
+    this.polygonDataCalc(data);
+    countCreate = (parseInt(countCreate) + 1).toString(10);
+  }
+
+  deleteArea(e) {
+    let data = draw.getAll();
+    console.log("LOG: deleteArea(data)", data);
+    const polygonData = data.features[0];
+    countCreate = (parseInt(countCreate) - 1).toString(10);
+  }
+
   render() {
     return (
       <div>
         <div ref={e => this.mapDiv = e} className="map"></div>
-        <div id='calculated-area' ref={el => this.polygonDiv = el}>
+        <div id='geoJASON' ref={el => this.polygonDiv = el}>
         </div>
       </div>
     )
