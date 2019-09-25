@@ -7,7 +7,7 @@ rasterio
 sentinelsat
 shapely
 earthengine-api
-
+tensorflow==1.14.0
 
 
 
