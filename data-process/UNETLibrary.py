@@ -28,10 +28,10 @@ def _process_pathnames(fname, label_path):
     img = tf.image.decode_png(img_str, channels=3)
 
     label_img_str = tf.read_file(label_path)
-    label_img = tf.image.decode_png(label_img_str)[0]
+    label_img = tf.image.decode_png(label_img_str,dtype=tf.dtypes.uint16)
   # The label image should only have values of 1 or 0, indicating pixel wise
   # object (sugarcane) or not (nonsugarcane). We take the first channel only. 
-    label_img = tf.expand_dims(label_img, axis=-1)
+  #  label_img = tf.expand_dims(label_img, axis=-1) # uncomment this if label_img is 2-dimemsion
     return img, label_img
 
 # shifting the image horizontally or vertically 
@@ -106,9 +106,58 @@ def get_baseline_dataset(inputs, # input filenames
     
     if shuffle:
         dataset = dataset.shuffle(num_x)
-  
-  
+    
   # It's necessary to repeat our data for all epochs 
     dataset = dataset.repeat().batch(batch_size)
     return dataset
+
+# blocks in UNET
+def conv_block(input_tensor, num_filters):
+    encoder = layers.Conv2D(num_filters, (3, 3), padding='same')(input_tensor)
+    encoder = layers.BatchNormalization()(encoder)
+    encoder = layers.Activation('relu')(encoder)
+    encoder = layers.Conv2D(num_filters, (3, 3), padding='same')(encoder)
+    encoder = layers.BatchNormalization()(encoder)
+    encoder = layers.Activation('relu')(encoder)
+    return encoder
+
+def encoder_block(input_tensor, num_filters):
+    encoder = conv_block(input_tensor, num_filters)
+    encoder_pool = layers.MaxPooling2D((2, 2), strides=(2, 2))(encoder)
+  
+    return encoder_pool, encoder
+
+def decoder_block(input_tensor, concat_tensor, num_filters):
+    decoder = layers.Conv2DTranspose(num_filters, (2, 2), strides=(2, 2), padding='same')(input_tensor)
+    decoder = layers.concatenate([concat_tensor, decoder], axis=-1)
+    decoder = layers.BatchNormalization()(decoder)
+    decoder = layers.Activation('relu')(decoder)
+    decoder = layers.Conv2D(num_filters, (3, 3), padding='same')(decoder)
+    decoder = layers.BatchNormalization()(decoder)
+    decoder = layers.Activation('relu')(decoder)
+    decoder = layers.Conv2D(num_filters, (3, 3), padding='same')(decoder)
+    decoder = layers.BatchNormalization()(decoder)
+    decoder = layers.Activation('relu')(decoder)
+    return decoder
+
+
+# loss functions
+def dice_coeff(y_true, y_pred):
+    smooth = 1.
+    # Flatten
+    y_true_f = tf.reshape(y_true, [-1])
+    y_pred_f = tf.reshape(y_pred, [-1])
+    intersection = tf.reduce_sum(y_true_f * y_pred_f)
+    score = (2. * intersection + smooth) / (tf.reduce_sum(y_true_f) + tf.reduce_sum(y_pred_f) + smooth)
+    return score
+
+
+def dice_loss(y_true, y_pred):
+    loss = 1 - dice_coeff(y_true, y_pred)
+    return loss
+
+
+def bce_dice_loss(y_true, y_pred):
+    loss = losses.binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
+    return loss
 
