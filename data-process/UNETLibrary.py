@@ -19,7 +19,6 @@ from tensorflow.python.keras import backend as K
 # some parameters init
 img_shape = (512, 512, 3)
 batch_size = 3
-epochs = 1
 
 # reading file into pixel level
 def _process_pathnames(fname, label_path):
