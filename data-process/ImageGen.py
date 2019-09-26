@@ -31,12 +31,6 @@ IS_IN_MASK_PIXEL_VALUE = (0, 0, 0, 255)
 TILE_WIDTH_PX = 512 
 TILE_HEIGHT_PX = 512 
 
-
-
-if not os.path.exists('./Data'):
-    print("No Data directory found, please download the data into the dame directory first")
-    exit()
-
 # Get the physical path to the PNG image containing the mask file
 def get_mask_path(tile_x, tile_y, mask_type): #mask_type is sugarcane coz it's in the file name
     path = f"./data/{mask_type}masks/mask-x{tile_x}-y{tile_y}.png"
@@ -283,9 +277,12 @@ def tile_id_gen():
 
 
 # creating (0,1) masks 
-tile_x, tile_y, count= tile_id_gen()
-print("Generating {} masks .....".format(count))
-for i in range(count):
-    get_mask_pixels(tile_x[i], tile_y[i],mask_type='sugarcane')
-print("all {} masks are saved in label folder".format(count))
+if not os.path.exists('./Data'):
+    print("No Data directory found, please download the data into the dame directory first")
+if not os.path.exists('./ModelTrainingData/label'): 
+    tile_x, tile_y, count= tile_id_gen()
+    print("Generating {} masks .....".format(count))
+    for i in range(count):
+        get_mask_pixels(tile_x[i], tile_y[i],mask_type='sugarcane')
+    print("all {} masks are saved in label folder".format(count))
 
