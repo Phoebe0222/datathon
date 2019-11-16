@@ -1,6 +1,23 @@
-import UNETLibrary
-from ImageGen import *
-from UNETLibrary import *
+import os
+import numpy as np
+
+import matplotlib as mpl
+mpl.rcParams['axes.grid'] = False
+mpl.rcParams['figure.figsize'] = (12,12)
+
+from sklearn.model_selection import train_test_split
+import matplotlib.image as mpimg
+import functools
+
+import tensorflow as tf
+import tensorflow.contrib as tfcontrib
+from tensorflow.python.keras import layers
+from tensorflow.python.keras import losses
+from tensorflow.python.keras import models
+from tensorflow.python.keras import backend as K
+
+from Util import ImageGen
+from Util import UNETLibrary
 
 img_shape = (512, 512, 3)
 batch_size = 3
@@ -61,11 +78,11 @@ val_preprocessing_fn = functools.partial(UNETLibrary._augment, **val_cfg)
 
 
 ##################### creating dataset using augmentation ####################
-train_ds = get_baseline_dataset(x_train_filenames,
+train_ds = UNETLibrary.get_baseline_dataset(x_train_filenames,
                                 y_train_filenames,
                                 preproc_fn=tr_preprocessing_fn,
                                 batch_size=batch_size)
-val_ds = get_baseline_dataset(x_val_filenames,
+val_ds = UNETLibrary.get_baseline_dataset(x_val_filenames,
                               y_val_filenames, 
                               preproc_fn=val_preprocessing_fn,
                               batch_size=batch_size)
@@ -77,46 +94,46 @@ val_ds = get_baseline_dataset(x_val_filenames,
 inputs = layers.Input(shape=img_shape)
 # 256
 
-encoder0_pool, encoder0 = encoder_block(inputs, 32)
+encoder0_pool, encoder0 = UNETLibrary.encoder_block(inputs, 32)
 # 128
 
-encoder1_pool, encoder1 = encoder_block(encoder0_pool, 64)
+encoder1_pool, encoder1 = UNETLibrary.encoder_block(encoder0_pool, 64)
 # 64
 
-encoder2_pool, encoder2 = encoder_block(encoder1_pool, 128)
+encoder2_pool, encoder2 = UNETLibrary.encoder_block(encoder1_pool, 128)
 # 32
 
-encoder3_pool, encoder3 = encoder_block(encoder2_pool, 256)
+encoder3_pool, encoder3 = UNETLibrary.encoder_block(encoder2_pool, 256)
 # 16
 
-encoder4_pool, encoder4 = encoder_block(encoder3_pool, 512)
+encoder4_pool, encoder4 = UNETLibrary.encoder_block(encoder3_pool, 512)
 # 8
 
-center = conv_block(encoder4_pool, 1024)
+center = UNETLibrary.conv_block(encoder4_pool, 1024)
 # center
 
-decoder4 = decoder_block(center, encoder4, 512)
+decoder4 = UNETLibrary.decoder_block(center, encoder4, 512)
 # 16
 
-decoder3 = decoder_block(decoder4, encoder3, 256)
+decoder3 = UNETLibrary.decoder_block(decoder4, encoder3, 256)
 # 32
 
-decoder2 = decoder_block(decoder3, encoder2, 128)
+decoder2 = UNETLibrary.decoder_block(decoder3, encoder2, 128)
 # 64
 
-decoder1 = decoder_block(decoder2, encoder1, 64)
+decoder1 = UNETLibrary.decoder_block(decoder2, encoder1, 64)
 # 128
 
-decoder0 = decoder_block(decoder1, encoder0, 32)
+decoder0 = UNETLibrary.decoder_block(decoder1, encoder0, 32)
 # 256
 
 outputs = layers.Conv2D(1, (1, 1), activation='sigmoid')(decoder0)
 
 model = models.Model(inputs=[inputs], outputs=[outputs])
 
-model.compile(optimizer='adam', loss=bce_dice_loss, metrics=[dice_loss])
+model.compile(optimizer='adam', loss=UNETLibrary.bce_dice_loss, metrics=[UNETLibrary.dice_loss])
 
-save_model_path = './models/UNET.hdf5'
+save_model_path = './savedModels/UNET.hdf5'
 cp = tf.keras.callbacks.ModelCheckpoint(filepath=save_model_path, 
                                         monitor='val_dice_loss', 
                                         save_best_only=True, verbose=1)

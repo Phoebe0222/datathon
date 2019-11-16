@@ -1,15 +1,15 @@
 import os 
 import subprocess
-import ImageGen
+from Util.ImageGen import *
 
 #####################  Create a text file of tile names in the Data Directory  #####################
 
 def tile_name_gen():
     if not os.path.exists('./Output'):
         os.makedirs('./Output')
-    subprocess.run("ls ./Data/tiles | cut -d'-' -f1 -f2 -f4 -f5 -f6|sort --unique > ./Output/tilenames.txt",shell=True)
+    subprocess.run("ls ../data/tiles | cut -d'-' -f1 -f2 -f4 -f5 -f6|sort --unique > ./Output/tilenames.txt",shell=True)
     f = open("./Output/tilenames.txt")
-    count = int(subprocess.run("ls ./Data/tiles | cut -d'-' -f1 -f2 -f4 -f5 -f6|sort --unique | wc -l", stdout=subprocess.PIPE,shell=True).stdout.decode('utf-8'))
+    count = int(subprocess.run("ls ../data/tiles | cut -d'-' -f1 -f2 -f4 -f5 -f6|sort --unique | wc -l", stdout=subprocess.PIPE,shell=True).stdout.decode('utf-8'))
     
     tile_x = []
     tile_y = []
@@ -47,12 +47,12 @@ for i in range(count):
         "tile_y":tile_y[i],
         "date":date[i]}
 
-    ImageGen.NDVI(**start_arg_img)
-    print("{} NDVI Done".format(count))
-    ImageGen.TCI(**start_arg_img)
-    print("{} TCI Done".format(count))
-    ImageGen.FCI(**start_arg_img)
-    print("{} FCI Done".format(count))
+    NDVI(**start_arg_img)
+    print("{} NDVI Done".format(i))
+    TCI(**start_arg_img)
+    print("{} TCI Done".format(i))
+    FCI(**start_arg_img)
+    print("{} FCI Done".format(i))
     
     #ImageGen.save_cropped(**start_arg_crop)
     #print("{} Cropped Done".format(count))

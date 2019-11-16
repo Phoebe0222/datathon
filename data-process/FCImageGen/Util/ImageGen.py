@@ -33,14 +33,14 @@ TILE_HEIGHT_PX = 512
 
 # Get the physical path to the PNG image containing the mask file
 def get_mask_path(tile_x, tile_y, mask_type): #mask_type is sugarcane coz it's in the file name
-    path = f"./data/{mask_type}masks/mask-x{tile_x}-y{tile_y}.png"
+    path = f"../data/{mask_type}masks/mask-x{tile_x}-y{tile_y}.png"
     return path
 
 
 # Get a path of band tile for a specific x,y coordinate
 # for the specified band and date
 def get_tiles_band_path(tile_x, tile_y, band, date):
-    path = f"./data/tiles/{tile_x}-{tile_y}-{band}-{date}.png"
+    path = f"../data/tiles/{tile_x}-{tile_y}-{band}-{date}.png"
     #path = glob.glob(path) # a list of paths
     #path = path[0] # get the first date 
     return path 
@@ -141,9 +141,9 @@ def get_mask_pixels(tile_x, tile_y,mask_type='sugarcane'):
     mask = Image.new("I", (width, height))
     mask.putdata(mask_sequence)
     #mask.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
-    if not os.path.exists('./ModelTrainingData/label'):
-        os.makedirs('./ModelTrainingData/label')
-    mask.save(f'./ModelTrainingData/label/mask-{tile_x}-{tile_y}.png')
+    if not os.path.exists('../models/ModelTrainingData/label'):
+        os.makedirs('../models/ModelTrainingData/label')
+    mask.save(f'../models/ModelTrainingData/label/mask-{tile_x}-{tile_y}.png')
     #print("mask-{}-{}".format(tile_x,tile_y)+" is saved")
     return mask_sequence
     
@@ -255,19 +255,19 @@ def NDVI(tile_x, tile_y, date):
 
 # generate tile ids 
 def tile_id_gen():
-    if not os.path.exists('./ModelTrainingData'):
-        os.makedirs('./ModelTrainingData')
+    if not os.path.exists('../models/ModelTrainingData'):
+        os.makedirs('../models/ModelTrainingData')
     # grab ids from tci image filenames 
-    subprocess.run("ls ./ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique > TileIds.txt",shell=True)
+    subprocess.run("ls ../models/ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique > TileIds.txt",shell=True)
     # count the number of ids 
-    count = int(subprocess.run("ls ./ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique | wc -l", stdout=subprocess.PIPE,shell=True).stdout.decode('utf-8'))
+    count = int(subprocess.run("ls ../models/ModelTrainingData/input | grep 'tci'| cut -d'-' -f2 -f3 |sort --unique | wc -l", stdout=subprocess.PIPE,shell=True).stdout.decode('utf-8'))
     
     tile_x = []
     tile_y = []
     img = []
     
     print("Creating the tile id list .....")
-    f = open("./ModelTrainingData/TileIds.txt")
+    f = open("../models/ModelTrainingData/TileIds.txt")
     for x in f:
         tile_x.append(str(x).split("-",1)[0])
         tile_y.append(str(x).split("-",1)[1].replace("\n",""))
@@ -277,9 +277,9 @@ def tile_id_gen():
 
 
 # creating (0,1) masks 
-if not os.path.exists('./Data'):
+if not os.path.exists('../data'):
     print("No Data directory found, please download the data into the dame directory first")
-if not os.path.exists('./ModelTrainingData/label'): 
+if not os.path.exists('../models/ModelTrainingData/label'): 
     tile_x, tile_y, count= tile_id_gen()
     print("Generating {} masks .....".format(count))
     for i in range(count):

@@ -1,5 +1,8 @@
 ## library for building UNET
 
+import os
+import numpy as np
+
 import matplotlib as mpl
 mpl.rcParams['axes.grid'] = False
 mpl.rcParams['figure.figsize'] = (12,12)
@@ -15,10 +18,9 @@ from tensorflow.python.keras import losses
 from tensorflow.python.keras import models
 from tensorflow.python.keras import backend as K
 
-
-# some parameters init
 img_shape = (512, 512, 3)
 batch_size = 3
+epochs = 5
 
 # reading file into pixel level
 def _process_pathnames(fname, label_path):
