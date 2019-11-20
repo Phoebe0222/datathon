@@ -15,7 +15,7 @@ var mapLayer = 'main-layer';
 var mapSource = 'main-source';
 MapboxGL.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
-let geoJSON;
+let geoJSON, geoPolygon;
 var countCreate = "0";
 
 export default class Mapload extends React.Component {
@@ -188,20 +188,38 @@ export default class Mapload extends React.Component {
       console.log("LOG: polygonDataCalc(data featres)", data.features["0"])
       console.log("LOG: polygonDataCalc(geometry)", data.features["0"].geometry);
       console.log("LOG: polygonDataCalc(coordinatesValue)", coordinatesValue)
-      geoJSON = {
-        feature: featureType,
-        coordinates: coordinatesValue,
-        centroid: centroid.geometry.coordinates,
-        area: roundedArea + " sq.m"
-      }
-      console.log("LOG: polygonDataCalc(geoJSON)", JSON.stringify(geoJSON))
-      let geoJSONStringified = JSON.stringify(geoJSON, undefined, 2)
-      let geoJSONReadable = this.syntaxHighlight(geoJSONStringified);
-      var preTag = document.createElement("pre");
-      var geoJSONTag = document.createTextNode(geoJSONStringified);
-      preTag.id = countCreate;
-      preTag.appendChild(geoJSONTag);
-      document.getElementById("geoJASON").appendChild(preTag);
+
+      geoPolygon = "POLYGON((" + coordinatesValue + "))";
+      console.log("LOG: polygonDataCalc(geoPolygon)", JSON.stringify(geoPolygon))
+      document.getElementById("geoJASON").innerHTML = geoPolygon;
+
+      // geoJSON = {
+      //   feature: featureType,
+      //   coordinates: coordinatesValue,
+      //   centroid: centroid.geometry.coordinates,
+      //   area: roundedArea + " sq.m"
+      // }
+      // let geoJSONStringified = JSON.stringify(geoJSON, undefined, 2)
+      // let geoJSONReadable = this.syntaxHighlight(geoJSONStringified);
+      // var preTag = document.createElement("pre");
+      // var geoJSONTag = document.createTextNode(geoJSONStringified);
+      // preTag.id = countCreate;
+      // preTag.appendChild(geoJSONTag);
+      // document.getElementById("geoJASON").appendChild(preTag);
+
+
+      // Sample Python Scripts  @Chamal need to run python script here . If we can do this one I can implement it properly
+      // var myPythonScriptPath = 'deploymentscript.py ' + geoPolygon + ' swwees323233';
+
+      // const { spawn } = require('child_process')
+      // const pyProg = spawn('python', ["sample.py"]);
+
+      // pyProg.stdout.on('data', function (data) {
+
+      //   console.log(data.toString());
+
+      // });
+
     } else {
       console.log("LOG: error(drawn area not fetched)");
     }
