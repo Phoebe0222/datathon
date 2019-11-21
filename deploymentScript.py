@@ -101,24 +101,24 @@ class sara():
 #  mlsa.unimelb.au@gmail.com:mlsa12345 https://copernicus.nci.org.au/sara.server/1.0/collections/S2/149f8167-d9f6-5ef3-8941-e44fb7d5526f/download
 
     def polygonInformation(arg_geometry, arg_unique_id):
-        # unique_id = 'default'
-        # geometry = 'POLYGON((149.03 -35.18,149.23 -35.18,149.23 -35.38,149.03 -35.38,149.03 -35.18))'
+        unique_id = 'default'
+        geometry = 'POLYGON((149.03 -35.18,149.23 -35.18,149.23 -35.38,149.03 -35.38,149.03 -35.18))'
         
-        # if arg_geometry:
-        #     geometry = arg_geometry
-        #     print(geometry)
+        if arg_geometry:
+            geometry = arg_geometry
+            print(geometry)
         
-        # if arg_unique_id:
-        #     unique_id = arg_unique_id
-        #     print(unique_id)
+        if arg_unique_id:
+            unique_id = arg_unique_id
+            print(unique_id)
 
-        # test = sara(geometry = geometry, unique_id = unique_id)
-        # test.get_url()
-        # test.get_json()
+        test = sara(geometry = geometry, unique_id = unique_id)
+        test.get_url()
+        test.get_json()
         print("Downloading the files...")
-        # test.download_from_link()
+        test.download_from_link()
         print("Creating Imges....")
-        # test.generate_images()
+        test.generate_images()
         return "request was successfull for submitting polygon information for " + arg_geometry + " of session " + arg_unique_id
 
 if __name__ == "__main__":
