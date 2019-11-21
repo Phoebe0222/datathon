@@ -193,21 +193,31 @@ export default class Mapload extends React.Component {
       console.log("LOG: polygonDataCalc(geoPolygon)", JSON.stringify(geoPolygon))
       document.getElementById("geoJASON").innerHTML = geoPolygon;
 
+      var xhr = new XMLHttpRequest()
 
-      const spawn = require('child_process').spawn;
-      const ls = spawn('python', ['script.py', 'arg1', 'arg2']);
+      xhr.addEventListener('load', () => {
+        // update the state of the component with the result here
+        console.log(xhr.responseText)
+      })
+      // open the request with the verb and the url
+      xhr.open('GET', 'http://localhost:5000/polygon/POLYGON((149.03%20-35.18,149.23%20-35.18,149.23%20-35.38,149.03%20-35.38,149.03%20-35.18))/shalitha')
+      // send the request
+      xhr.send()
 
-      ls.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-      });
+      // const spawn = require('child_process').spawn;
+      // const ls = spawn('python', ['script.py', 'arg1', 'arg2']);
 
-      ls.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-      });
+      // ls.stdout.on('data', (data) => {
+      //   console.log(`stdout: ${data}`);
+      // });
 
-      ls.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-      });
+      // ls.stderr.on('data', (data) => {
+      //   console.log(`stderr: ${data}`);
+      // });
+
+      // ls.on('close', (code) => {
+      //   console.log(`child process exited with code ${code}`);
+      // });
 
       // geoJSON = {
       //   feature: featureType,

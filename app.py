@@ -1,15 +1,26 @@
 # import necessary libraries
 from flask import Flask, render_template, request, jsonify, Blueprint
+from flask_restful import Resource, Api
 import ast
 import requests
 import json
 # from wit import Wit
 # from config import wit_access_token
 from handleWitResponse import handle_response
+import sample
+import deploymentScript
 
 
 # create instance of Flask app
 app = Flask(__name__, template_folder="client/build", static_folder="client/build/static")
+api = Api(app)
+
+class geoPolygonInformation(Resource):
+    def get(self, geo_polygon, unique_id):
+        return {'data': deploymentScript.sara.polygonInformation(geo_polygon, unique_id)}
+
+api.add_resource(geoPolygonInformation, '/polygon/<geo_polygon>/<unique_id>')
+
 
 # create route that renders index.html template
 @app.route("/")

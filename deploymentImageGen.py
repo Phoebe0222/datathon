@@ -38,9 +38,9 @@ def home_work(file_name):
             pass
         except NotADirectoryError:
             pass
-   
+
     path = "./{}/GRANULE/{}/IMG_DATA/R60m/".format(file_name,file_name)
-      
+
     for filename in os.listdir(path):
         try: 
             src = path + str(filename) 
@@ -63,7 +63,7 @@ def normalize(array):
 # get band pixels
 def get_band(file_name,band):
     path = get_tiles_band_path(file_name, band)
- 
+
     b = rio.open(path)
     read = normalize(b.read(1))
     
@@ -82,7 +82,7 @@ def TCI(file_name):
     
     get_red = get_band(file_name,band='B04')
     b4 = get_red['b']; red = get_red['read']
-   
+
     # Stack bands
     tci = np.dstack((red, green, blue))
     if not os.path.exists(f'./Output-{file_name}/tci'):
@@ -135,7 +135,7 @@ def NDVI(file_name):
     
     get_green = get_band( file_name,band='B03')
     b3 = get_green['b']; green = get_green['read']
-   
+
     ndvi = np.where((nir+red)==0., 0, (nir-red)/(nir+red))
 
     # Stack bands
